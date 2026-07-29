@@ -1,0 +1,162 @@
+# Providence
+
+A moral physics layer for game engines.
+
+Your engine already computes where a falling body lands, to a precision no human
+can match. Ask it what it means when one character betrays another and there is
+nothing there. To an engine, a murder and a handshake are the same event: a state
+change. Providence fills that gap.
+
+It is not a game and it is not an engine. It is a library you put underneath one.
+
+```
+npm install
+npm run dev
+```
+
+Then open <http://localhost:5174/providence.html>.
+
+---
+
+## What's in it
+
+### Souls — `src/providence/arcs.ts`, `arcs2.ts`, `adversaries.ts`
+
+21 NPC behaviours taken from figures in the text. The reason to look there is
+that game characters never change, and biblical ones do almost nothing else.
+
+Jonah runs from the errand you just gave him, and when circumstance drags him
+back he obeys and sulks about it. Peter denies you under pressure and cannot be
+bought back, only restored. Balaam's donkey sees what the rider cannot and
+overrules the player's own input. The serpent never fights: it offers something
+genuinely useful and is gone before the consequence lands.
+
+Each arc is a set of nodes and transitions. A transition carries the condition
+that fires it and the passage it comes from, and nothing else.
+
+### Relations — `src/providence/relations.ts`
+
+A graph. The interesting question is not what one character feels, it is what
+moves between them, so blessing, birthright, debt and grievance are modelled as
+objects with owners and transfer rules.
+
+A blessing is finite and irreversible once spoken. A debt does not evaporate when
+someone rescues you, it moves onto the redeemer at full cost, and only a kinsman
+may do it. Forgiveness cancels a claim and leaves the deed in the ledger, because
+deleting a record is amnesia, not pardon.
+
+Betrayal is the part worth reading. The weight is computed from the bond that was
+broken rather than looked up in a reputation table, so betraying a stranger and
+betraying a sworn ally differ by a factor of five. There is a test for it.
+
+### Places — `src/providence/places.ts`
+
+The tabernacle admits by qualification instead of by key: it asks what you are,
+not what you carry, and turning someone back to the outer court is not throwing
+them out of the camp. The cities of refuge are a covering problem, since the text
+asks for roads prepared so a fugitive can arrive in time, so they are solved as
+one.
+
+### The editor — `src/editor/`
+
+Pick a behaviour, flip a world condition in the toolbar, and watch it happen to a
+character standing in a 3D scene. Switch on *under threat* and Peter walks away
+from you. The console prints the transition and, under it, the verse it came
+from.
+
+Nothing in the viewport is scripted. It imports the same library the tests run.
+
+---
+
+## Scripture
+
+Providence contains no verse text. Arcs, deeds and thresholds hold references
+like `LUK.22.57`, and `src/providence/Scripture.ts` is the only door text comes
+through. Remove the key and every character goes silent. A test asserts exactly
+that, and another one reads the engine source files to check no verse has crept
+into them.
+
+The silence is deliberate. An invented line would be worse than nothing.
+
+### Keys
+
+```
+cp .env.example .env
+```
+
+Fill in `YOUVERSION_APP_KEY` (register at
+[platform.youversion.com](https://platform.youversion.com)) and optionally
+`GLOO_API_KEY`.
+
+Note the names are not prefixed `VITE_`. Anything with that prefix is compiled
+into the browser bundle and would be readable by anyone visiting the deployed
+site. The browser here calls `/scripture` on its own origin and `vite.config.ts`
+attaches the credential server side, so nothing secret is ever shipped. A test
+fails if someone reintroduces a `VITE_*KEY`.
+
+For production, keep the paths and move the header injection into a serverless
+function.
+
+### Gloo
+
+Gloo advises, Providence decides. When a developer declares an action the engine
+does not recognise, `Interpreter.ts` tries its own rules first, asks the model
+only if it still cannot tell, then checks the answer before accepting it. A
+proposal outside the vocabulary, or citing a passage that does not match the
+deed, is refused. Every verdict records who decided: `engine`, `model` or
+`refused`.
+
+A moral engine whose rules can be rewritten at runtime by a generative system
+does not really have rules.
+
+---
+
+## Godot
+
+`godot/addons/providence/` holds a GDScript port. Copy it into a Godot 4 project
+and enable the plugin; it registers a `Providence` autoload.
+
+Four arcs ship there rather than all 21. Each transition carries a condition, and
+a condition is code rather than data, so it cannot be exported from the
+TypeScript and re-read: it has to be written again. See `godot/README.md`.
+
+---
+
+## Tests
+
+```
+npm test
+```
+
+98 of them. The ones worth reading first are in
+`src/__tests__/providenceIntegrity.test.ts`, which assert the claims this project
+makes about itself, and `providenceEndToEnd.test.ts`, which runs one story
+through every part of the engine at once and calls the real platform.
+
+`providenceScale.test.ts` checks the graph on ten thousand agents. It asserts the
+shape of the growth curve rather than a wall clock time, because a millisecond
+budget is flaky on a loaded machine while the curve is what actually separates an
+indexed lookup from a scan.
+
+---
+
+## Repository layout
+
+```
+src/providence/     the library
+src/editor/         the editor, and the 3D viewport it draws into
+src/api/            YouVersion and Gloo clients
+src/scenes/         procedural humanoid and renderer, shared with the editor
+godot/              GDScript port
+```
+
+`src/core`, `src/entities`, `src/combat`, `src/data`, `src/ui` and
+`src/scenes/BossDuelScene.ts` are an earlier prototype, a boss fight where the
+player answers a lie with the right verse. It predates the library and does not
+use it. It is kept because the editor's 3D viewport reuses its renderer and its
+procedural character, and because its own tests still pass, but it is not part of
+Providence.
+
+## Licence
+
+MIT. See `LICENSE`.

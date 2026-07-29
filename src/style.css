@@ -1,0 +1,302 @@
+:root {
+  color-scheme: dark;
+  font: 16px/1.4 'Georgia', 'Times New Roman', serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #020202;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#stage {
+  position: relative;
+  aspect-ratio: 960 / 540;
+  /* Bounded by whichever viewport dimension is tighter, so the 16:9 frame
+     scales down uniformly instead of a fixed-height div letting `canvas
+     { width:100%; height:100% }` stretch the picture out of ratio. */
+  width: min(960px, 100vw, calc(100vh * 960 / 540));
+}
+
+#game-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+#hud-root {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* --- Éclat / boss gauges ------------------------------------------------ */
+
+.hud__top {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  right: 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.gauge {
+  width: 40%;
+}
+
+.gauge--boss {
+  text-align: right;
+}
+
+.gauge__label {
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #d4af37;
+  margin-bottom: 4px;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.4);
+}
+
+.gauge__track {
+  height: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.gauge__fill {
+  height: 100%;
+  width: 100%;
+  transition: width 120ms ease-out;
+}
+
+.gauge__fill--eclat {
+  background: linear-gradient(90deg, #ffd866, #fff4d6);
+  box-shadow: 0 0 10px rgba(255, 216, 102, 0.6);
+}
+
+.gauge--boss .gauge__fill {
+  margin-left: auto;
+}
+
+.gauge__fill--boss {
+  background: linear-gradient(90deg, #ff4b2b, #ffb347);
+  box-shadow: 0 0 10px rgba(255, 75, 43, 0.5);
+}
+
+/* --- Hint bar ------------------------------------------------------------ */
+
+.hint-bar {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 244, 214, 0.55);
+}
+
+/* --- Hit flash ------------------------------------------------------------ */
+
+.hit-flash {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 60, 30, 0);
+  transition: background 60ms ease-out;
+}
+
+.hit-flash--active {
+  background: rgba(255, 60, 30, 0.28);
+}
+
+/* One-frame white pop on a perfect parry — reads as the shield of faith
+   catching the blow. */
+.hit-flash--parry {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* --- Lie banner + shared modal chrome ------------------------------------ */
+
+.hidden {
+  display: none !important;
+}
+
+.lie-banner {
+  position: absolute;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  text-align: center;
+  pointer-events: none;
+}
+
+.lie-banner__text {
+  color: #ffb347;
+  font-style: italic;
+  font-size: 1.05rem;
+  text-shadow: 0 0 12px rgba(255, 75, 43, 0.5);
+  margin: 0 0 8px;
+}
+
+.lie-banner__timer {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.lie-banner__timer-fill {
+  height: 100%;
+  width: 100%;
+  background: #ffb347;
+}
+
+.arsenal-picker,
+.freeform-prompt {
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 82%;
+  background: rgba(5, 3, 2, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 8px;
+  padding: 16px 20px;
+  pointer-events: auto;
+  backdrop-filter: blur(3px);
+}
+
+.arsenal-picker h2,
+.freeform-prompt h2 {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  color: #fff4d6;
+  text-align: center;
+  font-weight: normal;
+  letter-spacing: 0.03em;
+}
+
+.arsenal-picker__cards {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.verse-card {
+  flex: 1 1 200px;
+  max-width: 260px;
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: #fff4d6;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: inherit;
+  transition: background 100ms ease-out, transform 100ms ease-out;
+}
+
+.verse-card:hover,
+.verse-card:focus-visible {
+  background: rgba(212, 175, 55, 0.22);
+  transform: translateY(-2px);
+}
+
+.verse-card__ref {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #d4af37;
+}
+
+.verse-card__text {
+  font-size: 0.85rem;
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.freeform-prompt__input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 6px;
+  color: #fff4d6;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 10px;
+  resize: none;
+}
+
+.freeform-prompt__submit {
+  display: block;
+  margin: 10px auto 0;
+  background: linear-gradient(90deg, #ffd866, #ffb347);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 22px;
+  font-family: inherit;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  color: #1a1408;
+}
+
+.freeform-prompt__submit:hover {
+  filter: brightness(1.1);
+}
+
+/* --- End screen ------------------------------------------------------------ */
+
+.end-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 1, 1, 0.88);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.end-screen__title {
+  font-size: 2.4rem;
+  letter-spacing: 0.08em;
+  margin: 0 0 12px;
+}
+
+.end-screen--victory .end-screen__title {
+  color: #ffd866;
+  text-shadow: 0 0 24px rgba(255, 216, 102, 0.6);
+}
+
+.end-screen--defeat .end-screen__title {
+  color: #8a6b1f;
+}
+
+.end-screen__message {
+  max-width: 60%;
+  color: rgba(255, 244, 214, 0.8);
+  font-style: italic;
+}
