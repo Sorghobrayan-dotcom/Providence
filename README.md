@@ -128,7 +128,7 @@ TypeScript and re-read: it has to be written again. See `godot/README.md`.
 npm test
 ```
 
-98 of them. The ones worth reading first are in
+101 of them. The ones worth reading first are in
 `src/__tests__/providenceIntegrity.test.ts`, which assert the claims this project
 makes about itself, and `providenceEndToEnd.test.ts`, which runs one story
 through every part of the engine at once and calls the real platform.
@@ -137,6 +137,15 @@ through every part of the engine at once and calls the real platform.
 shape of the growth curve rather than a wall clock time, because a millisecond
 budget is flaky on a loaded machine while the curve is what actually separates an
 indexed lookup from a scan.
+
+`providenceImpact.test.ts` runs the same three events twice: once through the
+bookkeeping every game already has, a number per character moved up and down, and
+once through Providence. Run it with `--reporter=verbose` to see the two columns
+side by side. The point is not that one is longer, it is that a single number
+cannot express the difference between betraying a passerby and betraying a sworn
+ally, however many lines you give it.
+
+Data structures and costs are written up in [docs/architecture.md](docs/architecture.md).
 
 ---
 
