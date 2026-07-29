@@ -1,3 +1,7 @@
+import type { Memory } from './memory';
+import type { Situation } from './drives';
+export type { Situation } from './drives';
+
 /**
  * Behaviour arcs.
  *
@@ -52,6 +56,11 @@ export interface WorldView {
   playerDeceived: boolean;
   /** Shared loot is lying unguarded within reach. */
   spoilUnguarded: boolean;
+  /**
+   * How this character reads the room. Optional: arcs that do not use drives
+   * never look at it, and a host game that does not model it never sets it.
+   */
+  situation?: Situation;
   /** Seconds spent in the current node. */
   timeInNode: number;
 }
@@ -59,6 +68,15 @@ export interface WorldView {
 export interface Context {
   readonly disposition: Disposition;
   readonly world: WorldView;
+  /** What this character knows about the player, read off the relation graph. */
+  readonly memory: Memory;
+  /**
+   * How many times this character has already been through the node it is
+   * standing in. A wound reopens faster than it first opened, so thresholds
+   * that depend on this are the difference between a state machine and a
+   * character with a history.
+   */
+  readonly scars: number;
 }
 
 /** What the host engine should make the NPC do this tick. */
@@ -105,6 +123,13 @@ export interface Transition {
    * `because` through the YouVersion Platform API.
    */
   readonly note: string;
+  /**
+   * Optional. When several transitions are eligible on the same tick, the one
+   * with the highest appeal wins instead of the first one written. This is what
+   * lets two characters in the same room, seeing the same thing, do opposite
+   * things: the options are identical, the pull is not.
+   */
+  readonly appeal?: (ctx: Context) => number;
 }
 
 export interface Node {

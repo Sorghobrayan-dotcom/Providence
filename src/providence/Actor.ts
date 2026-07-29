@@ -1,4 +1,5 @@
 import type { Arc, ArcEvent, Context, Directive, Disposition, Node, WorldView } from './types';
+import { NO_MEMORY, type Memory } from './memory';
 
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -25,6 +26,7 @@ export function blankWorld(): Omit<WorldView, 'timeInNode'> {
     underPressure: false,
     playerDeceived: false,
     spoilUnguarded: false,
+    situation: { disorder: 0, unmetNeed: 0, falsehood: 0, worthHearing: 0, clamour: 0, strain: 0 },
   };
 }
 
@@ -40,17 +42,32 @@ export class Actor {
   private elapsedInNode = 0;
   private driftCarry = 0;
   private readonly history: ArcEvent[] = [];
+  /** How many times each node has been entered, so wounds can reopen faster. */
+  private readonly visits = new Map<string, number>();
+  private memory: Memory;
 
-  constructor(arc: Arc) {
+  constructor(arc: Arc, memory: Memory = NO_MEMORY) {
     this.arc = arc;
+    this.memory = memory;
     this.disposition = { ...arc.start };
     const initial = arc.nodes.find((n) => n.id === arc.initial);
     if (!initial) throw new Error(`Arc "${arc.id}" has no node named "${arc.initial}".`);
     this.node = initial;
+    this.visits.set(initial.id, 1);
   }
 
   get state(): string {
     return this.node.id;
+  }
+
+  /** Times this character has already stood where it is standing now. */
+  get scars(): number {
+    return (this.visits.get(this.node.id) ?? 1) - 1;
+  }
+
+  /** Attach the character to a world it can remember things about. */
+  remembers(memory: Memory): void {
+    this.memory = memory;
   }
 
   get directive(): Directive {
@@ -90,10 +107,18 @@ export class Actor {
     const ctx: Context = {
       disposition: this.disposition,
       world: { ...world, timeInNode: this.elapsedInNode },
+      memory: this.memory,
+      scars: this.scars,
     };
 
-    for (const transition of this.node.transitions) {
-      if (!transition.when(ctx)) continue;
+    /* Collect everything eligible, then let appeal decide. Written-order still
+       wins when nothing declares an appeal, so arcs that do not care are
+       unaffected. */
+    const eligible = this.node.transitions.filter((t) => t.when(ctx));
+    if (eligible.length > 0) {
+      const transition = eligible.reduce((best, t) =>
+        (t.appeal?.(ctx) ?? 0) > (best.appeal?.(ctx) ?? 0) ? t : best,
+      );
       const next = this.arc.nodes.find((n) => n.id === transition.to);
       if (!next) throw new Error(`Arc "${this.arc.id}" points at missing node "${transition.to}".`);
 
@@ -104,6 +129,7 @@ export class Actor {
         note: transition.note,
       };
       this.node = next;
+      this.visits.set(next.id, (this.visits.get(next.id) ?? 0) + 1);
       this.elapsedInNode = 0;
       this.driftCarry = 0;
       this.history.push(event);

@@ -188,10 +188,11 @@ describe('The four ordinary ones', () => {
 });
 
 describe('the whole library holds together', () => {
-  it('has twenty one arcs, each transition sourced and reachable', () => {
-    expect(LIBRARY).toHaveLength(21);
+  it('every arc is uniquely named, sourced and reachable', () => {
+    // no magic number: the library grows, the invariant does not
     const ids = new Set(LIBRARY.map((a) => a.id));
-    expect(ids.size).toBe(21); // no duplicate identifiers
+    expect(ids.size).toBe(LIBRARY.length);
+    expect(LIBRARY.length).toBeGreaterThanOrEqual(21);
 
     for (const arc of LIBRARY) {
       const nodeIds = new Set(arc.nodes.map((n) => n.id));

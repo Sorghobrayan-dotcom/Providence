@@ -26,8 +26,11 @@ export const SERPENT: Arc = {
       directive: { move: 'hold', posture: 'watching' },
       transitions: [
         {
+          /* It comes closer, sooner, to someone already carrying a grievance.
+             Nothing in the arc says "target the wounded"; it falls out of
+             reading the graph. */
           to: 'questioning',
-          when: (c) => c.world.distanceToPlayer < 6,
+          when: (c) => c.world.distanceToPlayer < (c.memory.grievance > 0 ? 12 : 6),
           because: 'GEN.3.1',
           note: 'dieu a t il reellement dit',
         },
@@ -145,8 +148,10 @@ export const SAUL: Arc = {
       directive: { move: 'toward-player', posture: 'favouring' },
       transitions: [
         {
+          /* Renown is enough on its own, and holding something that was his
+             makes it immediate. */
           to: 'eyeing',
-          when: (c) => c.world.playerSucceeding,
+          when: (c) => c.world.playerSucceeding || c.memory.tookWhatWasMine,
           because: '1SA.18.7',
           note: 'saul a tue ses mille, et david ses dix mille',
         },

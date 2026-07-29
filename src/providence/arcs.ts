@@ -122,8 +122,10 @@ export const PETER: Arc = {
       drift: { fear: 0.09, trust: -0.02 },
       transitions: [
         {
+          // it took a great deal to break him the first time. It takes less
+          // afterwards, which is what a scar is
           to: 'denying',
-          when: (c) => c.disposition.fear > 0.7,
+          when: (c) => c.disposition.fear > Math.max(0.2, 0.7 - c.scars * 0.25),
           because: 'LUK.22.57',
           note: 'femme, je ne le connais pas',
         },
@@ -156,8 +158,11 @@ export const PETER: Arc = {
       drift: { fear: -0.08 },
       transitions: [
         {
+          /* Three kindnesses, plus two more for every betrayal standing in the
+             record. A man who has been sold once does not come back on the same
+             terms, and the graph is what remembers it, not a flag we set. */
           to: 'restored',
-          when: (c) => c.world.kindnessesWitnessed >= 3,
+          when: (c) => c.world.kindnessesWitnessed >= 3 + c.memory.betrayals * 2,
           because: 'JHN.21.17',
           note: 'trois fois demande, trois fois rendu',
         },
@@ -167,7 +172,17 @@ export const PETER: Arc = {
       id: 'restored',
       directive: { move: 'toward-player', posture: 'steadfast', companion: true },
       drift: { trust: 0.04 },
-      transitions: [],
+      transitions: [
+        {
+          /* Restoration is not immunity. He can be put in the same room again,
+             and the wound he already carries is what makes the second time
+             quicker than the first. */
+          to: 'pressed',
+          when: (c) => c.world.underThreat,
+          because: 'LUK.22.54',
+          note: 'il suit de loin, une fois de plus',
+        },
+      ],
     },
   ],
 };
@@ -199,8 +214,11 @@ export const RUTH: Arc = {
       directive: { move: 'hold', posture: 'observing' },
       transitions: [
         {
+          /* She binds on what she saw you do, and no amount of kindness aimed at
+             her will move her if you have hurt her household. The whole point of
+             the character is that she is not bought. */
           to: 'binding',
-          when: (c) => c.world.kindnessesWitnessed >= 2,
+          when: (c) => c.world.kindnessesWitnessed >= 2 && !c.memory.harmedMyHouse,
           because: 'RUT.1.16',
           note: 'ou tu iras j irai',
         },
@@ -252,11 +270,14 @@ export const DAVID_IN_THE_CAVE: Arc = {
     {
       id: 'advantage',
       directive: { move: 'hold', posture: 'blade-raised' },
+      // grievance hardens him: the resolve to strike decays more slowly
       drift: { resolve: -0.2 },
       transitions: [
         {
+          /* He lowers the blade because nothing was owed against him. Touch his
+             house and the same moment plays out differently. */
           to: 'restraint',
-          when: (c) => c.disposition.resolve < 0.45,
+          when: (c) => c.disposition.resolve < 0.45 && !c.memory.harmedMyHouse,
           because: '1SA.24.6',
           note: 'son coeur le reprend, il ne frappe pas',
         },
@@ -286,6 +307,7 @@ export const DAVID_IN_THE_CAVE: Arc = {
 
 import { INTERVENTION_ARCS } from './arcs2';
 import { ADVERSARY_ARCS, FURTHER_ARCS } from './adversaries';
+import { MOTIVATED_ARCS } from './motivated';
 
 /** How an NPC stands toward the player. */
 export const RELATIONSHIP_ARCS: readonly Arc[] = [JONAH, PETER, RUTH, DAVID_IN_THE_CAVE];
@@ -295,6 +317,7 @@ export const LIBRARY: readonly Arc[] = [
   ...INTERVENTION_ARCS,
   ...ADVERSARY_ARCS,
   ...FURTHER_ARCS,
+  ...MOTIVATED_ARCS,
 ];
 
 export function findArc(id: string): Arc | undefined {

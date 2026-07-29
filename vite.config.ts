@@ -23,8 +23,9 @@ export default defineConfig(({ mode }) => {
     build: {
       rollupOptions: {
         input: {
-          main: resolve(__dirname, 'index.html'),
-          providence: resolve(__dirname, 'providence.html'),
+          // the editor is the front door; the boss fight is an older sample
+          providence: resolve(__dirname, 'index.html'),
+          nuitDuBaton: resolve(__dirname, 'nuit-du-baton.html'),
         },
       },
     },
