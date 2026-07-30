@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Humanoid, type HumanoidPose } from '../scenes/Humanoid';
 import { Speech, type Voicing } from './Speech';
 import { bearingFor, carry, countenanceFor } from './Bearing';
+import type { Testimony } from '../providence/testimony';
 import { aspectOf, type Standing } from '../providence/standing';
 import type { Arc, Directive, Disposition } from '../providence/types';
 import { ADVERSARY_ARCS } from '../providence/adversaries';
@@ -54,6 +55,10 @@ export class Stage3D {
   private readonly otherPivot = new THREE.Group();
   private readonly errandMarker: THREE.Mesh;
   private readonly otherLight: THREE.PointLight;
+  /* Held so the testimony can move them. Assigned in buildLights, which the
+     constructor calls before anything can render. */
+  private hemi!: THREE.HemisphereLight;
+  private sun!: THREE.DirectionalLight;
   private readonly speech = new Speech();
 
   private elapsed = 0;
@@ -133,8 +138,10 @@ export class Stage3D {
   }
 
   private buildLights(): void {
-    this.scene.add(new THREE.HemisphereLight(0xb9c2d0, 0xb8946a, 0.9));
+    this.hemi = new THREE.HemisphereLight(0xb9c2d0, 0xb8946a, 0.9);
+    this.scene.add(this.hemi);
     const sun = new THREE.DirectionalLight(0xffe0b0, 1.4);
+    this.sun = sun;
     sun.position.set(-6, 10, 5);
     sun.castShadow = true;
     sun.shadow.mapSize.set(1024, 1024);
@@ -315,6 +322,7 @@ export class Stage3D {
     directive: Directive,
     disposition: Disposition,
     standing: Standing,
+    world: Testimony,
     player: { x: number; y: number },
     actorPos: { x: number; y: number },
     errand: { x: number; y: number },
@@ -366,8 +374,41 @@ export class Stage3D {
       new THREE.Vector3(this.camTarget.x, 3.4 + spread * 0.14, this.camTarget.z + 7.5 + spread * 0.5),
       0.08,
     );
-    this.camera.lookAt(this.camTarget);
+    this.witness(world);
+
+    /* The shake goes on after lookAt, so the camera is jolted rather than
+       aimed somewhere else — pointing it off target reads as a mistake. */
+    if (world.tremor > 0.001) {
+      const k = world.tremor * 0.09;
+      this.camera.position.x += Math.sin(this.elapsed * 41) * k;
+      this.camera.position.y += Math.sin(this.elapsed * 37) * k;
+    }
 
     this.gl.render(this.scene, this.camera);
+  }
+
+  /**
+   * The world answering whoever is standing in it.
+   *
+   * Light, haze and cast are the channels this renderer can actually show. Wind
+   * and sound are computed by testimony.ts and deliberately not faked here:
+   * there is no particle system and no audio bus yet, and moving the fog to
+   * stand in for wind would be a lie about what the engine can do.
+   */
+  private witness(world: Testimony): void {
+    // never all the way to black: an unlit scene reads as a bug, not as dread
+    this.sun.intensity = 1.4 * (0.18 + 0.82 * world.light);
+    this.hemi.intensity = 0.9 * (0.3 + 0.7 * world.light);
+
+    const fog = this.scene.fog as THREE.FogExp2 | null;
+    if (fog) {
+      fog.density = 0.03 + world.haze * 0.085;
+      // cold when the cast is negative, warm when it is positive
+      const tint = new THREE.Color(PALETTE.fog);
+      tint.lerp(new THREE.Color(world.cast < 0 ? 0x3d4a63 : 0xd8b478), Math.abs(world.cast) * 0.7);
+      tint.multiplyScalar(0.45 + 0.55 * world.light);
+      fog.color.copy(tint);
+      this.scene.background = tint;
+    }
   }
 }

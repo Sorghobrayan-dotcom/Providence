@@ -13,6 +13,7 @@ import { brandTab, LivePlumbLine } from './logo';
 import { approachFor, paceFor } from './Bearing';
 import { GlooVoice } from '../api/GlooVoice';
 import { covenantOf, NO_COVENANT } from '../providence/covenant';
+import { testimonyOf } from '../providence/testimony';
 import type { Occasion } from '../providence/Utterance';
 import { METRES_PER_UNIT } from './Stage3D';
 import { memoryFor } from '../providence/memory';
@@ -501,7 +502,13 @@ function frame(now: number): void {
   }
 
   applyDirective(dt);
-  stage.render(dt, actor.directive, actor.disposition, actor.bears, player, position, errand);
+
+  /* What the world does about him. Distance is what keeps this legible: the sky
+     answers the man you are standing next to, not the one across the map. */
+  const apart = Math.hypot(position.x - player.x, position.y - player.y) * METRES_PER_UNIT;
+  const weather = testimonyOf(arc.id, actor.disposition, actor.bears, apart);
+
+  stage.render(dt, actor.directive, actor.disposition, actor.bears, weather, player, position, errand);
   renderInspector();
   refreshApiState();
   requestAnimationFrame(frame);
