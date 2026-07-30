@@ -195,9 +195,20 @@ side by side. The point is not that one is longer, it is that a single number
 cannot express the difference between betraying a passerby and betraying a sworn
 ally, however many lines you give it.
 
-Data structures and costs are in [docs/architecture.md](docs/architecture.md), the
-grace specification in [docs/grace.md](docs/grace.md), and per-arc sheets in
-[docs/archetypes.md](docs/archetypes.md).
+## Documentation
+
+| | |
+| --- | --- |
+| [docs/architecture.md](docs/architecture.md) | data structures, index layout, costs |
+| [docs/grace.md](docs/grace.md) | the grace specification, written before the code |
+| [docs/archetypes.md](docs/archetypes.md) | per-arc sheets, generated from the library |
+| [docs/deploying.md](docs/deploying.md) | the Scripture proxy and what it refuses |
+| [docs/review.md](docs/review.md) | an honest audit, including what does not hold up |
+| [docs/writeup.md](docs/writeup.md) | the submission writeup |
+
+[docs/review.md](docs/review.md) is worth reading before the code. It lists the
+weaknesses as plainly as the strengths: the editor has no tests, the Godot addon
+has never been run, and the viewport is 482 kB of Three.js on a first paint.
 
 The sheets are generated from the library by `archetypeSheets.test.ts` rather than
 kept by hand. A table of 24 characters maintained manually drifts within a week,
