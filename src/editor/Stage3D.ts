@@ -57,6 +57,8 @@ export class Stage3D {
   private readonly otherLight: THREE.PointLight;
   /* Held so the testimony can move them. Assigned in buildLights, which the
      constructor calls before anything can render. */
+  /** Last frame's actor position, so facing can be read off real movement. */
+  private readonly lastOther = new THREE.Vector2();
   private hemi!: THREE.HemisphereLight;
   private sun!: THREE.DirectionalLight;
   private readonly speech = new Speech();
@@ -342,8 +344,18 @@ export class Stage3D {
     this.envoyPivot.rotation.y = Math.atan2(ax - px, az - pz);
     this.envoy.applyPose({ kind: 'idle' }, dtSeconds * 1000, this.elapsed);
 
-    // the actor faces where its directive is taking it
+    /* Face where it is actually going, not where the directive points.
+       Ways bend the path, and reading the facing off the directive would have
+       a flanking serpent slide sideways while staring straight ahead. Velocity
+       is the truth here; the directive is only the fallback for a body that is
+       not moving and so has no velocity to read. */
+    const wentX = ax - this.lastOther.x;
+    const wentZ = az - this.lastOther.y;
+    const travelled = Math.hypot(wentX, wentZ);
+    this.lastOther.set(ax, az);
+
     const facing =
+      travelled > 1e-4 ? Math.atan2(wentX, wentZ) :
       directive.move === 'toward-player' ? Math.atan2(px - ax, pz - az) :
       directive.move === 'away-from-player' ? Math.atan2(ax - px, az - pz) :
       directive.move === 'toward-errand' ? Math.atan2(ex - ax, ez - az) :

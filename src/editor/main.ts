@@ -14,6 +14,7 @@ import { approachFor, paceFor } from './Bearing';
 import { GlooVoice } from '../api/GlooVoice';
 import { covenantOf, NO_COVENANT } from '../providence/covenant';
 import { testimonyOf } from '../providence/testimony';
+import { headingFor, spaceFor, wayFor } from '../providence/ways';
 import type { Occasion } from '../providence/Utterance';
 import { METRES_PER_UNIT } from './Stage3D';
 import { memoryFor } from '../providence/memory';
@@ -456,12 +457,19 @@ function applyDirective(dt: number): void {
      render as a single figure — which is what was on screen. How far out it
      stops is the character's business: a companion who trusts you comes to your
      shoulder, one who does not keeps the length of a room. */
-  const keep = approachFor(actor.disposition, actor.directive.move) / METRES_PER_UNIT;
+  /* How it goes, as distinct from where. The directive already picked the
+     destination; the way bends the line taken to it and straightens on arrival,
+     so a serpent and a giant close the same gap differently. Most arcs have no
+     way and this is the identity. */
+  const way = wayFor(arc.id);
+
+  const keep = spaceFor(way, approachFor(actor.disposition, actor.directive.move)) / METRES_PER_UNIT;
   const step = Math.min(speed, Math.max(0, gap - keep));
   if (step <= 0) return;
 
-  position.x = Math.max(0.04, Math.min(0.96, position.x + (dx / gap) * step));
-  position.y = Math.max(0.06, Math.min(0.94, position.y + (dy / gap) * step));
+  const heading = headingFor(way, Math.atan2(dy, dx), clock, gap * METRES_PER_UNIT);
+  position.x = Math.max(0.04, Math.min(0.96, position.x + Math.cos(heading) * step));
+  position.y = Math.max(0.06, Math.min(0.94, position.y + Math.sin(heading) * step));
 }
 
 /* ------------------------------------------------------------------ */
