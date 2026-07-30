@@ -1,5 +1,7 @@
 import type { Memory } from './memory';
 import type { Situation } from './drives';
+import type { Covenant } from './covenant';
+import type { Standing } from './standing';
 export type { Situation } from './drives';
 
 /**
@@ -61,6 +63,17 @@ export interface WorldView {
    * never look at it, and a host game that does not model it never sets it.
    */
   situation?: Situation;
+  /**
+   * Where the player stands before the Law, read off the deed ledger. Optional
+   * for the same reason as `situation`: a host that does not track deeds never
+   * sets it, and arcs that do not care never look.
+   *
+   * This is not another `underThreat` flag. The flags above are what is
+   * happening now; this is the whole record of what the player has done, and it
+   * is the same record for everyone who looks. What differs is the reading —
+   * see `Eyes` in covenant.ts.
+   */
+  covenant?: Covenant;
   /** Seconds spent in the current node. */
   timeInNode: number;
 }
@@ -77,6 +90,19 @@ export interface Context {
    * character with a history.
    */
   readonly scars: number;
+  /**
+   * The player's standing, always present here even when the host does not
+   * track it — an arc reading `ctx.covenant.standing` must not have to guard
+   * against undefined on every line. Absent, it is the standing of someone with
+   * no record: neutral.
+   */
+  readonly covenant: Covenant;
+  /**
+   * This character's own standing: defiled, blood-guilty, in favour, and
+   * whether anyone else knows. The mirror of `covenant` — that is what the
+   * player has done, this is what I am — and a transition may read either.
+   */
+  readonly standing: Standing;
 }
 
 /** What the host engine should make the NPC do this tick. */

@@ -32,6 +32,62 @@ export const JONAH: Arc = {
           because: 'JON.3.3',
           note: 'il se met en route',
         },
+        /* The same request, answered opposite ways, and neither is a script.
+           Both exits are always written and always offered; which one fires is
+           decided by comparing their pull this tick. Nothing here branches on a
+           story flag or a quest step. */
+        {
+          to: 'shrinking',
+          when: (c) => c.world.requestsMade > 0 && c.covenant.standing === 'just',
+          // the more plainly righteous the asker, the harder this pulls
+          appeal: (c) => 0.5 + c.covenant.score * 0.5,
+          because: 'JON.4.2',
+          note: 'la piete en face de lui est une convocation, pas un secours',
+        },
+        {
+          to: 'confiding',
+          when: (c) => c.world.requestsMade > 0 && c.covenant.standing === 'transgressor',
+          // blood is a heavier bond between fugitives than a broken promise
+          appeal: (c) => 0.5 + (c.covenant.bloodGuilt > 0 ? 0.45 : 0.2),
+          because: 'JON.1.12',
+          note: 'un autre qui a fui: il cesse de tenir son histoire',
+        },
+      ],
+    },
+    {
+      /* Reached only by a righteous player asking. He does not fight and does
+         not bargain: he takes his eyes off you and puts distance in. */
+      id: 'shrinking',
+      directive: { move: 'away-from-player', posture: 'averting', refusing: true },
+      drift: { fear: 0.04, trust: -0.03 },
+      transitions: [
+        {
+          to: 'fleeing',
+          when: (c) => c.disposition.fear > 0.6 && c.world.errand !== null,
+          because: 'JON.1.3',
+          note: 'la convocation devient une fuite',
+        },
+        {
+          to: 'commissioned',
+          when: (c) => c.world.distanceToPlayer > 12,
+          because: 'JON.4.5',
+          note: 'assez loin pour se rasseoir avec sa rancune',
+        },
+      ],
+    },
+    {
+      /* Reached only by a transgressor asking. Same question, and he closes the
+         distance instead of opening it. */
+      id: 'confiding',
+      directive: { move: 'toward-player', posture: 'confiding' },
+      drift: { trust: 0.05, fear: -0.04 },
+      transitions: [
+        {
+          to: 'commissioned',
+          when: (c) => c.covenant.standing !== 'transgressor',
+          because: 'JON.4.2',
+          note: 'le compagnon de misere se revele juste, il se referme',
+        },
       ],
     },
     {

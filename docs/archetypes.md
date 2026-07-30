@@ -25,7 +25,9 @@ Starting disposition: trust 0.5, fear 0.3, resolve 0.25.
 
 | state | intends | drifts | goes to |
 | --- | --- | --- | --- |
-| `commissioned` | hold · burdened | — | `fleeing` (JON.1.3)<br>`obeying` (JON.3.3) |
+| `commissioned` | hold · burdened | — | `fleeing` (JON.1.3)<br>`obeying` (JON.3.3)<br>`shrinking` (JON.4.2)<br>`confiding` (JON.1.12) |
+| `shrinking` | away-from-player · averting · refusing | fear +0.04/s, trust -0.03/s | `fleeing` (JON.1.3)<br>`commissioned` (JON.4.5) |
+| `confiding` | toward-player · confiding | trust +0.05/s, fear -0.04/s | `commissioned` (JON.4.2) |
 | `fleeing` | away-from-errand · fleeing · refusing | fear +0.05/s | `caught` (JON.1.4) |
 | `caught` | hold · held | resolve +0.12/s, fear -0.06/s | `returning` (JON.2.10) |
 | `returning` | toward-errand · resigned | — | `obeying` (JON.3.3) |

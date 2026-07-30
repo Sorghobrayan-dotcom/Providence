@@ -1,4 +1,6 @@
 import type { Arc, ArcEvent, Context, Directive, Disposition, Node, WorldView } from './types';
+import { NO_COVENANT, readingFor } from './covenant';
+import { elapse, pressureOf, UNDEFILED, type Standing } from './standing';
 import { NO_MEMORY, type Memory } from './memory';
 import type { Atmosphere } from './atmosphere';
 
@@ -43,11 +45,14 @@ export class Actor {
   private elapsedInNode = 0;
   private driftCarry = 0;
   private placeCarry = 0;
+  private covenantCarry = 0;
   private readonly history: ArcEvent[] = [];
   /** How many times each node has been entered, so wounds can reopen faster. */
   private readonly visits = new Map<string, number>();
   private memory: Memory;
   private place: Atmosphere | null = null;
+  private borne: Standing = UNDEFILED;
+  private standingCarry = 0;
 
   constructor(arc: Arc, memory: Memory = NO_MEMORY) {
     this.arc = arc;
@@ -80,6 +85,19 @@ export class Actor {
 
   get standing(): Atmosphere | null {
     return this.place;
+  }
+
+  /**
+   * Give the character a standing of its own: defiled, blood-guilty, in favour,
+   * and whether anyone else knows. It travels with the character, so it is set
+   * here rather than read off the room or off the player.
+   */
+  stands(standing: Standing): void {
+    this.borne = standing;
+  }
+
+  get bears(): Standing {
+    return this.borne;
   }
 
   get directive(): Directive {
@@ -126,11 +144,41 @@ export class Actor {
       }
     }
 
+    /* What its own standing costs it, on its own carry. A secret presses every
+       second it stays a secret — that upkeep is the only thing that makes
+       concealment read as something carried rather than as a flag. */
+    this.borne = elapse(this.borne, dtSeconds);
+    const borne = pressureOf(this.borne);
+    if (Object.keys(borne).length > 0) {
+      this.standingCarry += dtSeconds;
+      while (this.standingCarry >= 1) {
+        this.standingCarry -= 1;
+        this.influence(borne);
+      }
+    }
+
+    const covenant = world.covenant ?? NO_COVENANT;
+
+    /* What the player's standing does to this character, on its own carry like
+       drift and the place. It is applied through the arc's own eyes, so the same
+       record raises fear on a fugitive and lowers it on someone devoted: the
+       fact is public, the reading is not. */
+    const reading = readingFor(this.arc.id, covenant);
+    if (Object.keys(reading.pressure).length > 0) {
+      this.covenantCarry += dtSeconds;
+      while (this.covenantCarry >= 1) {
+        this.covenantCarry -= 1;
+        this.influence(reading.pressure);
+      }
+    }
+
     const ctx: Context = {
       disposition: this.disposition,
       world: { ...world, timeInNode: this.elapsedInNode },
       memory: this.memory,
       scars: this.scars,
+      covenant,
+      standing: this.borne,
     };
 
     /* Collect everything eligible, then let appeal decide. Written-order still
