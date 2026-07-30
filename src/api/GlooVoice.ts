@@ -14,8 +14,13 @@ import { promptFor, tidy, type Occasion } from '../providence/Utterance';
 
 const ENDPOINT = '/gloo/ai/v2/chat/completions';
 
-/** Long enough for a routed model, short enough that a bark is not stale. */
-const TIMEOUT_MS = 6000;
+/**
+ * Measured against the live API, a bark takes 3.5 to 4.7 seconds. The first cut
+ * of this was 6000 and it cut real answers off: 1.3 seconds of headroom is not
+ * headroom. This is deliberately generous, because the caller drops a stale
+ * line on arrival anyway and a slow answer beats a fabricated one.
+ */
+const TIMEOUT_MS = 12000;
 
 interface Completion {
   choices?: { message?: { content?: string } }[];

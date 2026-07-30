@@ -270,9 +270,18 @@ async function report(
      served either, he says nothing at all: silence is the correct output, an
      invented line never is. */
   if (occasion) {
+    /* Generation takes about four seconds against the live API, which is long
+       enough for the character to have changed his mind twice. Remember who is
+       speaking and from where, and drop the answer if either moved on: a line
+       written for a state he has left is worse than no line at all. */
+    const speaker = actor;
+    const spokenFrom = occasion.node;
+
     // spread the passage only when there is one: an explicit `undefined` is
     // not the same as an absent optional under exactOptionalPropertyTypes
     const spoken = await voice.speak(line ? { ...occasion, passage: line.text } : occasion);
+    if (actor !== speaker || actor.state !== spokenFrom) return;
+
     if (spoken) {
       stage.say(spoken, ref, 'utterance');
       return;
