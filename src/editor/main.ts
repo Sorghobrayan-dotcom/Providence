@@ -11,6 +11,9 @@ import { GracePanel, PlacePanel, RelationPanel } from './panels';
 import { ScriptureConsole, type Channel } from './console';
 import { brandTab, LivePlumbLine } from './logo';
 import { approachFor, paceFor } from './Bearing';
+import { GlooVoice } from '../api/GlooVoice';
+import { covenantOf, NO_COVENANT } from '../providence/covenant';
+import type { Occasion } from '../providence/Utterance';
 import { METRES_PER_UNIT } from './Stage3D';
 import { memoryFor } from '../providence/memory';
 
@@ -133,6 +136,17 @@ for (const tab of document.querySelectorAll<HTMLButtonElement>('.tab')) {
 /* ------------------------------------------------------------------ */
 
 const world: World = { ...blankWorld(), distanceToPlayer: 8, errand: 'nineveh' };
+
+/* The voice. It holds no credential: it posts to a same-origin path and the
+   dev plugin exchanges the client secret for a token out of the browser's
+   reach. When it cannot answer, the character falls back to the passage. */
+const voice = new GlooVoice();
+
+/* Standing is read off the deed ledger, and only deeds change it, so this is
+   recomputed when the graph reports rather than on every frame. */
+function restate(): void {
+  world.covenant = covenantOf(relations.graph);
+}
 const player = { x: 0.5, y: 0.62 };
 const errand = { x: 0.845, y: 0.24 };
 
@@ -232,8 +246,10 @@ flagsEl.appendChild(kind);
 /* Console                                                             */
 /* ------------------------------------------------------------------ */
 
-/** Write a line, then hang the resolved verse under it. */
-async function report(channel: Channel, who: string, what: string, ref: string): Promise<void> {
+/** Write a line, hang the resolved verse under it, and let the character speak. */
+async function report(
+  channel: Channel, who: string, what: string, ref: string, occasion?: Omit<Occasion, 'passage'>,
+): Promise<void> {
   const entry = log.write(channel, who, what, ref);
   // a soul acting is the heaviest thing that happens, so it knocks the mark hardest
   mark.nudge(channel === 'editor' ? 0.22 : 0.55);
@@ -241,21 +257,28 @@ async function report(channel: Channel, who: string, what: string, ref: string):
   const line = await scripture.line(ref);
   entry.verse(line);
 
-  /* ── The seam where Gloo lands ───────────────────────────────────────────
-     What the character says should be his own words, not a citation: what
-     Jonah would actually say, given this arc, this node, this disposition and
-     what just happened. Gloo generates that from the structure; the passage
-     stays underneath as the reference it was drawn from.
+  /* Only the soul channel speaks aloud: grace and the graph are the engine
+     reporting, not anyone talking. */
+  if (channel !== 'arc') return;
 
-     Until that key exists there is nothing to generate from, so the plate falls
-     back to the passage itself, marked as scripture rather than dressed up as
-     speech. When Gloo arrives only this call changes — the plate, the timing,
-     the camera and the wrapping do not care where the words came from.
+  /* His own words first, generated from the structure — this arc, this node,
+     what just changed, how he is holding himself, what he carries, and who is
+     asking. The passage goes along as the reason, never as a script.
 
-     Only the soul channel: grace and the graph are the engine reporting, not
-     anyone talking. And only when something was actually served — with no line
-     the character is silent rather than saying something we invented. */
-  if (channel === 'arc' && line) stage.say(line.text, line.reference, 'scripture');
+     If Gloo cannot answer, the plate shows the passage instead, marked as
+     scripture rather than dressed up as dialogue. And if Scripture cannot be
+     served either, he says nothing at all: silence is the correct output, an
+     invented line never is. */
+  if (occasion) {
+    // spread the passage only when there is one: an explicit `undefined` is
+    // not the same as an absent optional under exactOptionalPropertyTypes
+    const spoken = await voice.speak(line ? { ...occasion, passage: line.text } : occasion);
+    if (spoken) {
+      stage.say(spoken, ref, 'utterance');
+      return;
+    }
+  }
+  if (line) stage.say(line.text, line.reference, 'scripture');
 }
 
 function note(what: string, ref: string): void {
@@ -445,7 +468,19 @@ function frame(now: number): void {
   world.hasLethalAdvantage = world.distanceToPlayer < 3;
 
   const event = actor.update(dt, world);
-  if (event) void report('arc', arc.id, `${event.from} → ${event.to}`, event.because);
+  if (event) {
+    void report('arc', arc.id, `${event.from} → ${event.to}`, event.because, {
+      arc,
+      node: event.to,
+      from: event.from,
+      // the directive of the node just entered, which is what he is doing as he speaks
+      directive: actor.directive,
+      disposition: { ...actor.disposition },
+      standing: actor.bears,
+      covenant: world.covenant ?? NO_COVENANT,
+      reference: event.because,
+    });
+  }
 
   /* Grace watches how closed the situation is. Standing next to the player with
      nothing pressing is not desperate; being cornered by a hostile one is. */
@@ -467,7 +502,11 @@ places.picked((place) => {
   actor.standsIn(place);
   note(`moved to ${place.label}`, place.source);
 });
-relations.reports((summary, because) => void report('graph', 'graph', summary, because));
+relations.reports((summary, because) => {
+  restate();
+  void report('graph', 'graph', summary, because);
+});
+restate();
 actor.standsIn(places.place);
 
 renderLibrary();
