@@ -1,0 +1,13 @@
+# The build is a plain static Vite output; the only server-side piece is the
+# Scripture proxy, which exists so the App Key never reaches the browser.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# providence.html is the product. index.html is the earlier boss-fight prototype,
+# kept because the editor reuses its renderer.
+[[redirects]]
+  from = "/"
+  to = "/providence.html"
+  status = 302
