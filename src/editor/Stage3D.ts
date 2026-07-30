@@ -1,6 +1,9 @@
 import * as THREE from 'three';
 import { Humanoid, type HumanoidPose } from '../scenes/Humanoid';
-import type { Arc, Directive } from '../providence/types';
+import { Speech, type Voicing } from './Speech';
+import { bearingFor, carry, countenanceFor } from './Bearing';
+import { aspectOf, type Standing } from '../providence/standing';
+import type { Arc, Directive, Disposition } from '../providence/types';
 import { ADVERSARY_ARCS } from '../providence/adversaries';
 
 /**
@@ -27,6 +30,13 @@ const groundHeight = (x: number, z: number): number =>
 
 /** Where the world sits, in metres. The editor thinks in 0..1, so we scale. */
 const SPAN = 9;
+
+/**
+ * Metres across one unit of the editor's 0..1 space. Exported because the
+ * movement code has to stop bodies a real distance apart, and a personal space
+ * measured in normalised units is a personal space nobody can reason about.
+ */
+export const METRES_PER_UNIT = SPAN * 2;
 const toWorld = (p: { x: number; y: number }): [number, number] => [
   (p.x - 0.5) * SPAN * 2,
   (p.y - 0.5) * SPAN * 2,
@@ -44,10 +54,19 @@ export class Stage3D {
   private readonly otherPivot = new THREE.Group();
   private readonly errandMarker: THREE.Mesh;
   private readonly otherLight: THREE.PointLight;
+  private readonly speech = new Speech();
 
   private elapsed = 0;
   private isShadow = false;
   private readonly camTarget = new THREE.Vector3();
+
+  /* The colours the actor was dressed in, kept so the countenance can drain
+     towards ash and come back. Reading them off the live material instead would
+     mean withering a body that has already withered, every frame, until it is
+     black. */
+  private readonly tunicBase = new THREE.Color();
+  private readonly bodyBase = new THREE.Color();
+  private readonly ash = new THREE.Color(0x555056);
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
@@ -73,6 +92,12 @@ export class Stage3D {
 
     this.otherPivot.add(this.other.root);
     this.scene.add(this.otherPivot);
+
+    /* Speech rides on the actor's pivot, so it follows the body without any
+       per-frame bookkeeping. A sprite ignores the pivot's rotation for its own
+       facing, and sitting on the axis means the turn does not swing it. */
+    this.speech.sprite.position.y = 2.05;
+    this.otherPivot.add(this.speech.sprite);
 
     this.otherLight = new THREE.PointLight(0xffffff, 0, 8, 2);
     this.otherLight.position.y = 1.1;
@@ -204,8 +229,19 @@ export class Stage3D {
     this.camera.updateProjectionMatrix();
   }
 
+  /**
+   * The character speaks. `voicing` says whether these are his own words or a
+   * passage being cited — when neither can be had this is simply never called,
+   * and he is silent rather than made to say something invented.
+   */
+  say(text: string, reference: string, voicing: Voicing): void {
+    this.speech.say(text, reference, voicing);
+  }
+
   /** Dress the actor for the arc that was just selected. */
   setArc(arc: Arc): void {
+    // whoever was mid-sentence is not the one standing here now
+    this.speech.hush();
     this.isShadow = ADVERSARY_ARCS.some((a) => a.id === arc.id);
     if (this.isShadow) {
       this.other.becomeShadow();
@@ -217,6 +253,43 @@ export class Stage3D {
       this.other.root.scale.setScalar(1);
       this.otherLight.color.setHex(0x8fb0c9);
     }
+    // whatever it is wearing now is what withering will be measured against
+    this.tunicBase.copy(this.other.tunicMat.color);
+    this.bodyBase.copy(this.other.bodyMat.color);
+  }
+
+  /**
+   * Drain or light the surface according to what the character is carrying.
+   *
+   * This is the channel that survives distance. A hunch of a few degrees is
+   * gone the moment the camera pulls back to frame two people; a body that has
+   * gone grey is legible at any range, which is the whole point.
+   */
+  private countenance(disposition: Disposition, standing: Standing): void {
+    /* Standing owns the surface; mood only tints it. A frightened man is not a
+       defiled one, and computing withering from fear — which is what this did
+       first — said he was. Where a standing exists it decides, and the
+       disposition contributes the last fraction. */
+    const mood = countenanceFor(disposition);
+    const aspect = aspectOf(standing);
+
+    const wither = Math.min(1, aspect.wither + mood.wither * 0.3);
+    const glow = Math.max(aspect.glow, mood.glow * 0.5);
+
+    this.other.tunicMat.color.copy(this.tunicBase).lerp(this.ash, wither * 0.8);
+    this.other.bodyMat.color.copy(this.bodyBase).lerp(this.ash, wither * 0.45);
+
+    // the shadow arcs have their own ember and must not be handed a halo
+    if (this.isShadow) return;
+
+    /* A man keeping a secret still performs being clean, and the performance is
+       what gives him away: nothing else in this scene flickers, so an unsteady
+       light reads immediately as something being held together. */
+    const steady = 1 - aspect.flicker * (0.35 + 0.65 * Math.abs(Math.sin(this.elapsed * 5.3)));
+
+    this.other.tunicMat.emissive.copy(this.tunicBase);
+    this.other.tunicMat.emissiveIntensity = glow * 0.34 * steady;
+    this.otherLight.intensity = (0.55 + glow * 1.5) * steady;
   }
 
   /**
@@ -240,6 +313,8 @@ export class Stage3D {
   render(
     dtSeconds: number,
     directive: Directive,
+    disposition: Disposition,
+    standing: Standing,
     player: { x: number; y: number },
     actorPos: { x: number; y: number },
     errand: { x: number; y: number },
@@ -273,11 +348,20 @@ export class Stage3D {
     this.otherPivot.rotation.y += d * Math.min(1, dtSeconds * 8);
 
     this.other.applyPose(this.poseFor(directive, directive.move !== 'hold'), dtSeconds * 1000, this.elapsed);
-    this.otherLight.intensity = this.isShadow ? 1.6 : 0.9;
+    /* What it is doing, then what it feels about doing it. This has to run after
+       applyPose, which resets every limb at the top of its own frame. */
+    carry(this.other, bearingFor(disposition, directive.move, this.elapsed), this.other.hipsRest, this.elapsed);
 
-    // frame both, backing off as they separate
+    if (this.isShadow) this.otherLight.intensity = 1.6;
+    this.countenance(disposition, standing);
+    this.speech.update(dtSeconds);
+
+    // frame both, backing off as they separate, and lifting to keep a plate in
+    // shot while someone is speaking — a line delivered off the top of the
+    // screen has not been delivered
     const spread = Math.hypot(ax - px, az - pz);
-    this.camTarget.lerp(new THREE.Vector3((px + ax) / 2, 1.1, (pz + az) / 2), 0.08);
+    const eyeline = this.speech.isSpeaking ? 1.95 : 1.1;
+    this.camTarget.lerp(new THREE.Vector3((px + ax) / 2, eyeline, (pz + az) / 2), 0.08);
     this.camera.position.lerp(
       new THREE.Vector3(this.camTarget.x, 3.4 + spread * 0.14, this.camTarget.z + 7.5 + spread * 0.5),
       0.08,

@@ -8,6 +8,10 @@ import { YouVersionClient } from '../api/YouVersionClient';
 import type { Arc, Directive, WorldView } from '../providence/types';
 import { Stage3D } from './Stage3D';
 import { GracePanel, PlacePanel, RelationPanel } from './panels';
+import { ScriptureConsole, type Channel } from './console';
+import { brandTab, LivePlumbLine } from './logo';
+import { approachFor, paceFor } from './Bearing';
+import { METRES_PER_UNIT } from './Stage3D';
 import { memoryFor } from '../providence/memory';
 
 /**
@@ -58,8 +62,11 @@ if (!root) throw new Error('providence.html is missing #editor.');
 root.innerHTML = `
   <div class="toolbar">
     <div class="brand">
-      <h1>Providence</h1>
-      <span>moral physics layer &middot; ${LIBRARY.length} arcs loaded</span>
+      <span id="mark"></span>
+      <div class="brand-text">
+        <h1>Providence</h1>
+        <span>a plumb line for game worlds &middot; ${LIBRARY.length} arcs</span>
+      </div>
     </div>
     <div class="flags" id="flags"></div>
     <div class="api-state" id="api-state">scripture: checking</div>
@@ -84,16 +91,22 @@ root.innerHTML = `
     </div>
     <div class="dock-body" id="inspector"></div>
   </aside>
-
-  <section class="dock console">
-    <div class="dock-title">Scripture console &middot; every transition states its source</div>
-    <div class="console-body" id="console"></div>
-  </section>
 `;
 
 const libraryEl = document.getElementById('library') as HTMLElement;
 const inspectorEl = document.getElementById('inspector') as HTMLElement;
-const consoleEl = document.getElementById('console') as HTMLElement;
+
+/* The console owns its own markup because it has real behaviour: a pointer
+   lens, a legend that mutes channels, and copying. Building it in here would
+   leave the queries and the DOM tangled together. */
+const log = new ScriptureConsole();
+root.appendChild(log.root);
+
+/* The mark hangs on a damped pendulum and every event knocks it, so the header
+   reads as an instrument: a quiet world leaves it dead vertical. */
+const mark = new LivePlumbLine(24);
+(document.getElementById('mark') as HTMLElement).replaceWith(mark.root);
+brandTab('Providence — a plumb line for game worlds');
 const flagsEl = document.getElementById('flags') as HTMLElement;
 const apiEl = document.getElementById('api-state') as HTMLElement;
 const canvas = document.getElementById('stage') as HTMLCanvasElement;
@@ -135,7 +148,6 @@ function selectArc(next: Arc): void {
   actor.standsIn(places.place);
   position = { x: 0.28, y: 0.42 };
   clock = 0;
-  consoleEl.replaceChildren();
   stage.setArc(next);
   renderLibrary();
   note(`loaded ${next.id}`, next.source);
@@ -220,52 +232,35 @@ flagsEl.appendChild(kind);
 /* Console                                                             */
 /* ------------------------------------------------------------------ */
 
-function stamp(): string {
-  const s = Math.floor(clock);
-  return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-}
+/** Write a line, then hang the resolved verse under it. */
+async function report(channel: Channel, who: string, what: string, ref: string): Promise<void> {
+  const entry = log.write(channel, who, what, ref);
+  // a soul acting is the heaviest thing that happens, so it knocks the mark hardest
+  mark.nudge(channel === 'editor' ? 0.22 : 0.55);
 
-function row(who: string, what: string, ref: string): HTMLElement {
-  const entry = document.createElement('div');
-  entry.className = 'entry';
-  for (const [cls, text] of [['t', stamp()], ['who', who], ['what', what], ['ref', ref]] as const) {
-    const cell = document.createElement('span');
-    cell.className = cls;
-    cell.textContent = text;
-    entry.appendChild(cell);
-  }
-  consoleEl.prepend(entry);
-  while (consoleEl.children.length > 60) consoleEl.lastChild?.remove();
-  return entry;
+  const line = await scripture.line(ref);
+  entry.verse(line);
+
+  /* ── The seam where Gloo lands ───────────────────────────────────────────
+     What the character says should be his own words, not a citation: what
+     Jonah would actually say, given this arc, this node, this disposition and
+     what just happened. Gloo generates that from the structure; the passage
+     stays underneath as the reference it was drawn from.
+
+     Until that key exists there is nothing to generate from, so the plate falls
+     back to the passage itself, marked as scripture rather than dressed up as
+     speech. When Gloo arrives only this call changes — the plate, the timing,
+     the camera and the wrapping do not care where the words came from.
+
+     Only the soul channel: grace and the graph are the engine reporting, not
+     anyone talking. And only when something was actually served — with no line
+     the character is silent rather than saying something we invented. */
+  if (channel === 'arc' && line) stage.say(line.text, line.reference, 'scripture');
 }
 
 function note(what: string, ref: string): void {
-  row('editor', what, ref);
-}
-
-/** Show the transition, then hang the resolved verse under it. */
-async function report(who: string, what: string, ref: string): Promise<void> {
-  const entry = row(who, what, ref);
-  const line = await scripture.line(ref);
-
-  if (!line) {
-    // no key and nothing in the pack: the character has nothing to say, and we
-    // refuse to invent something for it
-    const mute = document.createElement('div');
-    mute.className = 'mute';
-    mute.textContent = `${ref} unavailable — no API key and not in the offline pack. The character stays silent.`;
-    entry.insertAdjacentElement('afterend', mute);
-    return;
-  }
-
-  const verse = document.createElement('div');
-  verse.className = 'verse';
-  verse.textContent = `« ${line.text} »`;
-  const src = document.createElement('span');
-  src.className = 'src';
-  src.textContent = line.source === 'live' ? 'youversion, live' : 'offline pack';
-  verse.appendChild(src);
-  entry.appendChild(verse);
+  log.write('editor', 'editor', what, ref);
+  mark.nudge(0.22);
 }
 
 function refreshApiState(): void {
@@ -406,7 +401,9 @@ canvas.addEventListener('pointerup', () => {
 
 /** Move the actor according to the directive the library returned. */
 function applyDirective(dt: number): void {
-  const speed = 0.16 * dt;
+  // where it goes is the library's call; how urgently it gets there is what it
+  // feels about going, which is the whole point of the disposition
+  const speed = 0.16 * dt * paceFor(actor.disposition, actor.directive.move, clock);
   const target =
     actor.directive.move === 'toward-player' ? player :
     actor.directive.move === 'away-from-player' ? { x: 2 * position.x - player.x, y: 2 * position.y - player.y } :
@@ -414,13 +411,24 @@ function applyDirective(dt: number): void {
     actor.directive.move === 'away-from-errand' ? { x: 2 * position.x - errand.x, y: 2 * position.y - errand.y } :
     null;
 
-  if (target) {
-    const dx = target.x - position.x;
-    const dy = target.y - position.y;
-    const len = Math.hypot(dx, dy) || 1;
-    position.x = Math.max(0.04, Math.min(0.96, position.x + (dx / len) * speed));
-    position.y = Math.max(0.06, Math.min(0.94, position.y + (dy / len) * speed));
-  }
+  if (!target) return;
+
+  const dx = target.x - position.x;
+  const dy = target.y - position.y;
+  const gap = Math.hypot(dx, dy);
+  if (gap < 1e-6) return;
+
+  /* Stop at arm's length instead of at the other body's exact coordinates.
+     Without this the actor walks clean through the player and the two of them
+     render as a single figure — which is what was on screen. How far out it
+     stops is the character's business: a companion who trusts you comes to your
+     shoulder, one who does not keeps the length of a room. */
+  const keep = approachFor(actor.disposition, actor.directive.move) / METRES_PER_UNIT;
+  const step = Math.min(speed, Math.max(0, gap - keep));
+  if (step <= 0) return;
+
+  position.x = Math.max(0.04, Math.min(0.96, position.x + (dx / gap) * step));
+  position.y = Math.max(0.06, Math.min(0.94, position.y + (dy / gap) * step));
 }
 
 /* ------------------------------------------------------------------ */
@@ -437,7 +445,7 @@ function frame(now: number): void {
   world.hasLethalAdvantage = world.distanceToPlayer < 3;
 
   const event = actor.update(dt, world);
-  if (event) void report(arc.id, `${event.from} → ${event.to}`, event.because);
+  if (event) void report('arc', arc.id, `${event.from} → ${event.to}`, event.because);
 
   /* Grace watches how closed the situation is. Standing next to the player with
      nothing pressing is not desperate; being cornered by a hostile one is. */
@@ -445,11 +453,11 @@ function frame(now: number): void {
   const graceReport = graceView.grace.observe(cornered ? 0.95 : 0.2, dt);
   if (graceReport.outcome === 'given' || graceReport.outcome === 'withheld') {
     graceView.show(graceReport);
-    if (graceReport.because) void report('grace', graceReport.outcome, graceReport.because);
+    if (graceReport.because) void report('grace', 'grace', graceReport.outcome, graceReport.because);
   }
 
   applyDirective(dt);
-  stage.render(dt, actor.directive, player, position, errand);
+  stage.render(dt, actor.directive, actor.disposition, actor.bears, player, position, errand);
   renderInspector();
   refreshApiState();
   requestAnimationFrame(frame);
@@ -459,7 +467,7 @@ places.picked((place) => {
   actor.standsIn(place);
   note(`moved to ${place.label}`, place.source);
 });
-relations.reports((summary, because) => void report('graph', summary, because));
+relations.reports((summary, because) => void report('graph', 'graph', summary, because));
 actor.standsIn(places.place);
 
 renderLibrary();
