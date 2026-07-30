@@ -205,12 +205,37 @@ and a document that disagrees with the code is worse than none.
 
 ---
 
+## The notebook
+
+`notebook/providence.ipynb` is the Kaggle submission. A Kaggle notebook runs
+Python and the engine is TypeScript, so rather than describe the code and ask a
+reader to take it on trust, the laws are ported there faithfully and executed.
+Press Run All and every claim prints its own proof, with the numbers matching
+this test suite.
+
+It makes one live call to the YouVersion Platform API. On Kaggle, add the App Key
+as a secret named `YOUVERSION_APP_KEY`; locally it also reads `.env`. Without a
+key the notebook says so and shows the silence rather than pretending.
+
+```
+python notebook/build.py   # regenerate the .ipynb after editing a cell
+python notebook/run.py     # execute every code cell in order, as Run All would
+```
+
+The .ipynb is generated from `build.py` rather than hand-edited, because JSON
+edited by hand acquires broken escapes and duplicate cell ids within a day.
+`run.py` exists because a notebook whose assertions have never actually been
+executed is the kind of claim this project is built to avoid making.
+
+---
+
 ## Repository layout
 
 ```
 src/providence/     the library
 src/editor/         the editor, and the 3D viewport it draws into
 src/api/            YouVersion and Gloo clients
+notebook/           the Kaggle notebook, its generator and its runner
 src/scenes/         procedural humanoid and renderer, shared with the editor
 godot/              GDScript port
 ```
