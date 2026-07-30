@@ -30,6 +30,15 @@ export const BALAAMS_DONKEY: Arc = {
           because: 'NUM.22.23',
           note: "l anesse voit ce que l homme ne voit pas",
         },
+        {
+          /* Nobody has to point anything out. A frightening place raises fear
+             on its own, and she balks on that alone, which is the difference
+             between a beast that reads a flag and a beast that reads a room. */
+          to: 'seeing',
+          when: (c) => c.disposition.fear > 0.7,
+          because: 'NUM.22.23',
+          note: "elle sent le lieu, et refuse d avancer",
+        },
       ],
     },
     {
@@ -39,13 +48,14 @@ export const BALAAMS_DONKEY: Arc = {
       transitions: [
         {
           to: 'refusing',
-          when: (c) => c.world.dangerAhead && c.world.timeInNode > 1,
+          when: (c) => (c.world.dangerAhead || c.disposition.fear > 0.7) && c.world.timeInNode > 1,
           because: 'NUM.22.27',
           note: "elle se couche sous lui et ne veut plus avancer",
         },
         {
+          // she only goes on once BOTH the shown danger and the felt one are gone
           to: 'carrying',
-          when: (c) => !c.world.dangerAhead,
+          when: (c) => !c.world.dangerAhead && c.disposition.fear < 0.5,
           because: 'NUM.22.23',
           note: 'la voie est libre, elle repart',
         },
@@ -64,7 +74,7 @@ export const BALAAMS_DONKEY: Arc = {
         },
         {
           to: 'carrying',
-          when: (c) => !c.world.dangerAhead,
+          when: (c) => !c.world.dangerAhead && c.disposition.fear < 0.5,
           because: 'NUM.22.35',
           note: 'le peril leve, elle se releve',
         },
@@ -89,7 +99,7 @@ export const BALAAMS_DONKEY: Arc = {
       transitions: [
         {
           to: 'carrying',
-          when: (c) => !c.world.dangerAhead,
+          when: (c) => !c.world.dangerAhead && c.disposition.fear < 0.5,
           because: 'NUM.22.35',
           note: 'va, mais ne dis que ce qui te sera dit',
         },

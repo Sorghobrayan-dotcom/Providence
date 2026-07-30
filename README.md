@@ -20,9 +20,9 @@ Then open <http://localhost:5174/providence.html>.
 
 ## What's in it
 
-### Souls — `src/providence/arcs.ts`, `arcs2.ts`, `adversaries.ts`
+### Souls — `src/providence/arcs.ts`, `arcs2.ts`, `adversaries.ts`, `motivated.ts`
 
-21 NPC behaviours taken from figures in the text. The reason to look there is
+24 NPC behaviours taken from figures in the text. The reason to look there is
 that game characters never change, and biblical ones do almost nothing else.
 
 Jonah runs from the errand you just gave him, and when circumstance drags him
@@ -57,6 +57,50 @@ them out of the camp. The cities of refuge are a covering problem, since the tex
 asks for roads prepared so a fugitive can arrive in time, so they are solved as
 one.
 
+### Drives — `src/providence/drives.ts`, `motivated.ts`
+
+Arcs say what a character does. Drives say what pulls at it, so when several
+transitions are eligible on the same tick the strongest pull wins instead of the
+first one written.
+
+Martha and Mary are the case worth reading. Same room, same interruption, and
+their arcs are structurally identical: only the drives differ. One goes to the
+mess, the other does not move. A small disorder pulls Martha out of her seat while
+she is listening and leaves Mary exactly where she is.
+
+Each profile also carries four layers: what breaks its normal state, what it does
+first, where it goes if the strain never lets up, and what brings it back. The
+last one is the layer games skip. Tidying the whole house does not settle Martha,
+and shouting at Elijah does nothing at all.
+
+### Grace — `src/providence/grace.ts`
+
+Specified in [docs/grace.md](docs/grace.md) before a line of it was written,
+because the code is not the hard part.
+
+Four properties make it sovereign rather than merely generous: no game code can
+call it, no parameter shapes it, no studio can sell it, and its rate moves with
+nothing the player did. One draw per episode at 0.2, so four desperate moments in
+five receive nothing. When it does fire it opens a door rather than undoing the
+loss.
+
+### Atmospheres — `src/providence/atmosphere.ts`
+
+A room presses on the people standing in it. It puts a floor under what the scene
+is already doing, leans on certain drives, and weighs on the disposition itself.
+
+That last part is what lets a place reach all 24 arcs rather than only the three
+built on drives. Stand Balaam's donkey in a frightening room and it balks and lies
+down with no danger ever shown to it, and neither the arc nor the atmosphere knows
+the other exists.
+
+### Simulation — `src/providence/simulate.ts`
+
+Headless runs, so behaviour is measured instead of admired. A thousand runs of the
+same cast in two rooms, same seed: Martha ends up complaining every time in a
+palace and settled in a desert, and Elijah reaches his quiet ending 208 times out
+of 600 in the desert and never once at court.
+
 ### The editor — `src/editor/`
 
 Pick a behaviour, flip a world condition in the toolbar, and watch it happen to a
@@ -65,6 +109,12 @@ from you. The console prints the transition and, under it, the verse it came
 from.
 
 Nothing in the viewport is scripted. It imports the same library the tests run.
+
+The inspector has four tabs. **Soul** is the arc and its disposition. **Relations**
+draws the graph, lets you commit deeds against it, and prints the ledger.
+**Place** moves the character between atmospheres. **Grace** shows the running
+tally and states the four properties, since a feature defined by what it refuses
+to do is otherwise invisible.
 
 ---
 
@@ -128,7 +178,7 @@ TypeScript and re-read: it has to be written again. See `godot/README.md`.
 npm test
 ```
 
-101 of them. The ones worth reading first are in
+157 of them. The ones worth reading first are in
 `src/__tests__/providenceIntegrity.test.ts`, which assert the claims this project
 makes about itself, and `providenceEndToEnd.test.ts`, which runs one story
 through every part of the engine at once and calls the real platform.
@@ -145,7 +195,13 @@ side by side. The point is not that one is longer, it is that a single number
 cannot express the difference between betraying a passerby and betraying a sworn
 ally, however many lines you give it.
 
-Data structures and costs are written up in [docs/architecture.md](docs/architecture.md).
+Data structures and costs are in [docs/architecture.md](docs/architecture.md), the
+grace specification in [docs/grace.md](docs/grace.md), and per-arc sheets in
+[docs/archetypes.md](docs/archetypes.md).
+
+The sheets are generated from the library by `archetypeSheets.test.ts` rather than
+kept by hand. A table of 24 characters maintained manually drifts within a week,
+and a document that disagrees with the code is worse than none.
 
 ---
 

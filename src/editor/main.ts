@@ -7,6 +7,8 @@ import { PUBLIC_DOMAIN_PACK, Scripture } from '../providence/Scripture';
 import { YouVersionClient } from '../api/YouVersionClient';
 import type { Arc, Directive, WorldView } from '../providence/types';
 import { Stage3D } from './Stage3D';
+import { GracePanel, PlacePanel, RelationPanel } from './panels';
+import { memoryFor } from '../providence/memory';
 
 /**
  * The Providence editor.
@@ -74,7 +76,12 @@ root.innerHTML = `
   </main>
 
   <aside class="dock inspector">
-    <div class="dock-title">Inspector</div>
+    <div class="tabs" role="tablist">
+      <button class="tab" type="button" role="tab" data-panel="soul" aria-selected="true">Soul</button>
+      <button class="tab" type="button" role="tab" data-panel="relations" aria-selected="false">Relations</button>
+      <button class="tab" type="button" role="tab" data-panel="place" aria-selected="false">Place</button>
+      <button class="tab" type="button" role="tab" data-panel="grace" aria-selected="false">Grace</button>
+    </div>
     <div class="dock-body" id="inspector"></div>
   </aside>
 
@@ -91,6 +98,23 @@ const flagsEl = document.getElementById('flags') as HTMLElement;
 const apiEl = document.getElementById('api-state') as HTMLElement;
 const canvas = document.getElementById('stage') as HTMLCanvasElement;
 
+/* The graph, the places and grace were only ever visible in the tests, which
+   made the tool look like a behaviour browser rather than the whole library. */
+const relations = new RelationPanel();
+const places = new PlacePanel();
+const graceView = new GracePanel();
+let panel: 'soul' | 'relations' | 'place' | 'grace' = 'soul';
+
+for (const tab of document.querySelectorAll<HTMLButtonElement>('.tab')) {
+  tab.addEventListener('click', () => {
+    panel = tab.dataset['panel'] as typeof panel;
+    for (const other of document.querySelectorAll('.tab')) {
+      other.setAttribute('aria-selected', String(other === tab));
+    }
+    tab.blur();
+  });
+}
+
 /* ------------------------------------------------------------------ */
 /* State                                                               */
 /* ------------------------------------------------------------------ */
@@ -101,12 +125,14 @@ const errand = { x: 0.845, y: 0.24 };
 
 let arc: Arc = LIBRARY[0] as Arc;
 let actor = new Actor(arc);
+
 let position = { x: 0.28, y: 0.42 };
 let clock = 0;
 
 function selectArc(next: Arc): void {
   arc = next;
-  actor = new Actor(next);
+  actor = new Actor(next, memoryFor(relations.graph, next.id));
+  actor.standsIn(places.place);
   position = { x: 0.28, y: 0.42 };
   clock = 0;
   consoleEl.replaceChildren();
@@ -285,6 +311,19 @@ function field(name: string, build: (host: HTMLElement) => void): HTMLElement {
 }
 
 function renderInspector(): void {
+  if (panel === 'relations') {
+    if (inspectorEl.firstChild !== relations.root) inspectorEl.replaceChildren(relations.root);
+    return;
+  }
+  if (panel === 'place') {
+    if (inspectorEl.firstChild !== places.root) inspectorEl.replaceChildren(places.root);
+    return;
+  }
+  if (panel === 'grace') {
+    if (inspectorEl.firstChild !== graceView.root) inspectorEl.replaceChildren(graceView.root);
+    return;
+  }
+
   const d = actor.directive;
   const frag = document.createDocumentFragment();
 
@@ -400,12 +439,28 @@ function frame(now: number): void {
   const event = actor.update(dt, world);
   if (event) void report(arc.id, `${event.from} → ${event.to}`, event.because);
 
+  /* Grace watches how closed the situation is. Standing next to the player with
+     nothing pressing is not desperate; being cornered by a hostile one is. */
+  const cornered = actor.directive.hostile === true && world.distanceToPlayer < 4;
+  const graceReport = graceView.grace.observe(cornered ? 0.95 : 0.2, dt);
+  if (graceReport.outcome === 'given' || graceReport.outcome === 'withheld') {
+    graceView.show(graceReport);
+    if (graceReport.because) void report('grace', graceReport.outcome, graceReport.because);
+  }
+
   applyDirective(dt);
   stage.render(dt, actor.directive, player, position, errand);
   renderInspector();
   refreshApiState();
   requestAnimationFrame(frame);
 }
+
+places.picked((place) => {
+  actor.standsIn(place);
+  note(`moved to ${place.label}`, place.source);
+});
+relations.reports((summary, because) => void report('graph', summary, because));
+actor.standsIn(places.place);
 
 renderLibrary();
 stage.setArc(arc);

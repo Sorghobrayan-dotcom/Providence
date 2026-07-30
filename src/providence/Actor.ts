@@ -1,5 +1,6 @@
 import type { Arc, ArcEvent, Context, Directive, Disposition, Node, WorldView } from './types';
 import { NO_MEMORY, type Memory } from './memory';
+import type { Atmosphere } from './atmosphere';
 
 const clamp01 = (v: number): number => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -41,10 +42,12 @@ export class Actor {
   private node: Node;
   private elapsedInNode = 0;
   private driftCarry = 0;
+  private placeCarry = 0;
   private readonly history: ArcEvent[] = [];
   /** How many times each node has been entered, so wounds can reopen faster. */
   private readonly visits = new Map<string, number>();
   private memory: Memory;
+  private place: Atmosphere | null = null;
 
   constructor(arc: Arc, memory: Memory = NO_MEMORY) {
     this.arc = arc;
@@ -68,6 +71,15 @@ export class Actor {
   /** Attach the character to a world it can remember things about. */
   remembers(memory: Memory): void {
     this.memory = memory;
+  }
+
+  /** Put the character somewhere. The room then weighs on it every second. */
+  standsIn(place: Atmosphere | null): void {
+    this.place = place;
+  }
+
+  get standing(): Atmosphere | null {
+    return this.place;
   }
 
   get directive(): Directive {
@@ -101,6 +113,16 @@ export class Actor {
       while (this.driftCarry >= 1) {
         this.driftCarry -= 1;
         this.influence(this.node.drift);
+      }
+    }
+
+    /* The room presses whether or not the node drifts, on its own carry, so a
+       character standing still in a frightening place still becomes afraid. */
+    if (this.place?.weighs) {
+      this.placeCarry += dtSeconds;
+      while (this.placeCarry >= 1) {
+        this.placeCarry -= 1;
+        this.influence(this.place.weighs);
       }
     }
 

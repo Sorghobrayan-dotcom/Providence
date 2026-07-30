@@ -1,4 +1,5 @@
 import type { Drives, Situation } from './drives';
+import type { Disposition } from './types';
 
 /**
  * Where a scene happens changes what happens in it.
@@ -20,6 +21,15 @@ export interface Atmosphere {
   readonly ambient: Partial<Situation>;
   /** Multipliers on each drive. 1 leaves a want untouched. */
   readonly leans: Partial<Drives>;
+  /**
+   * Per second pressure on the disposition of anyone standing here.
+   *
+   * This is what lets a place reach every arc rather than only the three built
+   * on drives. Fear, resolve and trust are read by all twenty four, so a room
+   * that frightens people frightens Peter and the donkey alike, without either
+   * arc knowing that atmospheres exist.
+   */
+  readonly weighs?: Partial<Disposition>;
   readonly source: string;
   readonly note: string;
 }
@@ -34,12 +44,24 @@ export const NOWHERE: Atmosphere = {
   note: 'a room with no character of its own',
 };
 
+export const DREAD: Atmosphere = {
+  id: 'dread',
+  label: 'L Effroi',
+  ambient: { clamour: 0.35, strain: 0.5 },
+  leans: { rest: 1.5, standing: 0.3, attention: 0.7 },
+  // the room itself does the frightening; nothing has to happen
+  weighs: { fear: 0.07, resolve: -0.03 },
+  source: 'NUM.22.23',
+  note: 'where a beast sees what its rider does not, and will not go on',
+};
+
 export const DESERT: Atmosphere = {
   id: 'desert',
   label: 'Le Desert',
   // nothing to tidy, nobody to impress, and the strain never stops climbing
   ambient: { disorder: 0, clamour: 0.05, strain: 0.35 },
   leans: { order: 0.3, standing: 0.2, rest: 1.6, attention: 1.4, justice: 1.1 },
+  weighs: { fear: -0.02, resolve: -0.02 },
   source: '1KI.19.4',
   note: 'where a man asks to die, and where he is answered quietly',
 };
@@ -50,6 +72,7 @@ export const PALACE: Atmosphere = {
   // noise, an audience, and everything visibly in or out of its place
   ambient: { clamour: 0.55, disorder: 0.25, worthHearing: 0.15 },
   leans: { standing: 1.7, order: 1.4, service: 1.2, rest: 0.4, attention: 0.6 },
+  weighs: { fear: 0.02, resolve: 0.02 },
   source: '1SA.18.6',
   note: 'where women sing your rival s name and a king counts the numbers',
 };
@@ -68,6 +91,7 @@ export const TEMPLE: Atmosphere = {
   label: 'Le Temple',
   ambient: { worthHearing: 0.6, clamour: 0.2 },
   leans: { attention: 1.5, order: 1.3, justice: 1.4, standing: 0.5, rest: 0.8 },
+  weighs: { fear: -0.03, resolve: 0.03 },
   source: 'EXO.26.33',
   note: 'graduated ground, where what you are decides how far in you stand',
 };
@@ -81,7 +105,7 @@ export const ROAD: Atmosphere = {
   note: 'where most pass by on the other side',
 };
 
-export const ATMOSPHERES: readonly Atmosphere[] = [NOWHERE, DESERT, PALACE, HOUSEHOLD, TEMPLE, ROAD];
+export const ATMOSPHERES: readonly Atmosphere[] = [NOWHERE, DREAD, DESERT, PALACE, HOUSEHOLD, TEMPLE, ROAD];
 
 export function atmosphere(id: string): Atmosphere | undefined {
   return ATMOSPHERES.find((a) => a.id === id);
