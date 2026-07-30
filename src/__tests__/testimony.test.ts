@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  CLEAR, SIGNS, gather, nearness, signFor, testimonyOf, urgencyOf,
+  CLEAR, SIGNS, SITUATIONS, gather, nearness, signFor, situationsIn, testimonyOf, urgencyOf,
 } from '../providence/testimony';
 import { UNDEFILED, defile, shedBlood } from '../providence/standing';
 import { Actor, blankWorld } from '../providence/Actor';
@@ -218,6 +218,51 @@ describe('the channels stay inside their own range', () => {
       expect(sign.source, id).toMatch(/^[A-Z0-9]{3}\.\d+\.\d+$/);
       expect(sign.note.length, id).toBeGreaterThan(20);
       expect(Object.keys(sign.moves).length, id).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('the scene testifies too, not only the man', () => {
+  const flags = (...on: string[]) => Object.fromEntries(on.map((f) => [f, true]));
+
+  it('says nothing when no flag is set', () => {
+    expect(situationsIn({})).toEqual([]);
+    expect(situationsIn({ atrocityImminent: false })).toEqual([]);
+  });
+
+  it('darkens the sky over an imminent atrocity, whoever is standing there', () => {
+    const [t] = situationsIn(flags('atrocityImminent'));
+    expect(t!.light).toBeLessThan(0.45);
+    expect(t!.wind).toBeGreaterThan(CLEAR.wind * 5);
+  });
+
+  it('opens it up when the player is succeeding', () => {
+    const [t] = situationsIn(flags('playerSucceeding'));
+    // at least one flag has to go the other way or this is only a dimmer, and
+    // the earlier version of this passed only because light was pinned at its
+    // ceiling and could not rise
+    expect(t!.light).toBeGreaterThan(CLEAR.light + 0.1);
+    expect(t!.haze).toBeLessThan(CLEAR.haze);
+    expect(t!.cast).toBeGreaterThan(0.2);
+  });
+
+  it('reaches the sky even when the character is perfectly calm', () => {
+    const calmMan = testimonyOf('ruth', calm, UNDEFILED, 2);
+    const sky = gather([calmMan, ...situationsIn(flags('atrocityImminent'))]);
+    expect(sky.light).toBeLessThan(0.45);
+  });
+
+  it('lets a storm and a warning stack without cancelling out', () => {
+    const running = testimonyOf('jonah', terrified, UNDEFILED, 0);
+    const sky = gather([running, ...situationsIn(flags('dangerAhead'))]);
+    expect(sky.light).toBeLessThanOrEqual(running.light);
+    expect(sky.wind).toBeGreaterThanOrEqual(running.wind);
+  });
+
+  it('names a passage for every situation', () => {
+    for (const [flag, sign] of Object.entries(SITUATIONS)) {
+      expect(sign.source, flag).toMatch(/^[A-Z0-9]{3}\.\d+\.\d+$/);
+      expect(Object.keys(sign.moves).length, flag).toBeGreaterThan(0);
     }
   });
 });

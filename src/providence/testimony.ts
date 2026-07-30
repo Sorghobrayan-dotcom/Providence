@@ -75,9 +75,16 @@ export interface Testimony {
   readonly cast: number;
 }
 
-/** A world with nobody in it worth remarking on. */
+/**
+ * A world with nobody in it worth remarking on.
+ *
+ * Light sits below its ceiling on purpose. At 1.0 there was no headroom above
+ * the default, so a sign that opened the sky up had nowhere to go and the whole
+ * scale ran one way — every flag was a dimmer. An ordinary day is bright but
+ * not the brightest thing the renderer can show.
+ */
 export const CLEAR: Testimony = {
-  light: 1, wind: 0.08, haze: 0.05, tremor: 0, sound: 1, cast: 0,
+  light: 0.85, wind: 0.08, haze: 0.05, tremor: 0, sound: 1, cast: 0,
 };
 
 export interface Sign {
@@ -157,6 +164,68 @@ export const SIGNS: Readonly<Record<string, Sign>> = {
 
 export function signFor(arcId: string): Sign {
   return SIGNS[arcId] ?? UNREMARKABLE;
+}
+
+/**
+ * What the situation testifies, as distinct from what the man does.
+ *
+ * The first cut of this module read the character and nothing else, so every
+ * toggle in the world panel changed the simulation and left the sky exactly
+ * where it was. Setting "an atrocity is imminent" is a fact about the scene,
+ * not about anyone's disposition, and a world that does not darken over it is
+ * not testifying to anything.
+ *
+ * These are booleans, so they arrive at full strength rather than on a curve.
+ * A thing is either about to happen or it is not.
+ */
+export const SITUATIONS: Readonly<Record<string, Sign>> = {
+  atrocityImminent: {
+    moves: { light: -0.62, wind: 0.55, haze: 0.3, cast: -0.5, sound: -0.35 },
+    source: 'AMO.8.9',
+    note: 'the sun goes down at noon, and the earth is darkened in a clear day',
+  },
+  dangerAhead: {
+    moves: { wind: 0.5, haze: 0.4, cast: -0.35, light: -0.25 },
+    source: 'PRO.22.3',
+    note: 'the prudent sees danger and hides himself, and the simple go on',
+  },
+  underThreat: {
+    moves: { sound: -0.4, haze: 0.35, light: -0.2, tremor: 0.15 },
+    source: 'PSA.23.4',
+    note: 'the valley of the shadow, where the danger is present rather than ahead',
+  },
+  playerSuffering: {
+    moves: { light: -0.3, wind: -0.05, sound: -0.3, cast: -0.25 },
+    source: 'JOB.2.13',
+    note: 'seven days and seven nights, and none of them spoke a word to him',
+  },
+  /* The one that goes the other way. Without at least one channel that opens
+     up, every toggle darkens the world and the effect reads as a dimmer. */
+  playerSucceeding: {
+    moves: { light: 0.25, haze: -0.045, cast: 0.3, wind: -0.03 },
+    source: 'PRO.4.18',
+    note: 'the path of the just is as the shining light, brighter unto the perfect day',
+  },
+  playerReturning: {
+    moves: { light: 0.18, cast: 0.4, sound: 0.0 },
+    source: 'LUK.15.20',
+    note: 'while he was yet a great way off, his father saw him and ran',
+  },
+};
+
+/** Which flags in a scene are currently saying something. */
+export function situationsIn(scene: Readonly<Record<string, unknown>>): Testimony[] {
+  const out: Testimony[] = [];
+  for (const [flag, sign] of Object.entries(SITUATIONS)) {
+    if (scene[flag] !== true) continue;
+    const t = { ...CLEAR };
+    for (const key of Object.keys(sign.moves) as (keyof Testimony)[]) {
+      const low = key === 'cast' ? -1 : 0;
+      t[key] = Math.max(low, Math.min(1, CLEAR[key] + (sign.moves[key] ?? 0)));
+    }
+    out.push(t);
+  }
+  return out;
 }
 
 /**

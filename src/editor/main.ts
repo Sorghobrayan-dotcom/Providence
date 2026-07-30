@@ -13,7 +13,7 @@ import { brandTab, LivePlumbLine } from './logo';
 import { approachFor, paceFor } from './Bearing';
 import { GlooVoice } from '../api/GlooVoice';
 import { covenantOf, NO_COVENANT } from '../providence/covenant';
-import { testimonyOf } from '../providence/testimony';
+import { gather, situationsIn, testimonyOf } from '../providence/testimony';
 import { headingFor, spaceFor, wayFor } from '../providence/ways';
 import type { Occasion } from '../providence/Utterance';
 import { METRES_PER_UNIT } from './Stage3D';
@@ -514,7 +514,13 @@ function frame(now: number): void {
   /* What the world does about him. Distance is what keeps this legible: the sky
      answers the man you are standing next to, not the one across the map. */
   const apart = Math.hypot(position.x - player.x, position.y - player.y) * METRES_PER_UNIT;
-  const weather = testimonyOf(arc.id, actor.disposition, actor.bears, apart);
+  /* One sky, from everyone who has something to say about it: the man standing
+     there, and the scene itself. gather() takes the furthest departure per
+     channel, so a toggle cannot be washed out by a calm character. */
+  const weather = gather([
+    testimonyOf(arc.id, actor.disposition, actor.bears, apart),
+    ...situationsIn(world as unknown as Record<string, unknown>),
+  ]);
 
   stage.render(dt, actor.directive, actor.disposition, actor.bears, weather, player, position, errand);
   renderInspector();
