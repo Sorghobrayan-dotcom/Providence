@@ -10,8 +10,8 @@ than a day.
 | | |
 | --- | --- |
 | engine | 4,841 lines across 20 modules |
-| tests | 4,476 lines, 362 assertions in 27 files |
-| editor | 2,155 lines, 58 assertions in 3 files |
+| tests | 4,656 lines, 377 assertions in 29 files |
+| editor | 2,540 lines, 73 assertions in 5 files |
 | notebook | 47 cells, 25 of them executable, all passing |
 | bundle | 59 kB for the editor, 482 kB for Three.js |
 
@@ -43,11 +43,12 @@ and two in the proxy. None of them were visible on the page.
 
 ## What does not hold up
 
-**Half the editor still has no tests.** This was the worst thing on the list and
-it is now half fixed: `Bearing`, `Speech`, the console and the logo carry 58
-assertions between them. `panels.ts`, `main.ts` and `Stage3D.ts` — 1,204 of the
-2,155 lines — remain uncovered, and the graph layout in the panels is real logic
-sitting behind no net at all.
+**`main.ts` and `Stage3D.ts` still have no tests.** This was the worst thing on
+the list and most of it is now closed: `Bearing`, `Speech`, the console, the
+logo, the cues and the relation panel carry 73 assertions between them. What is
+left is the 979 lines of wiring in `main.ts` and the viewport, and the wiring is
+where the last two real bugs were found — the boot path that set the first arc
+up by hand, and the cast that left it out of the graph.
 
 **Godot ships 4 arcs, not 24.** A transition holds a predicate, and a predicate
 is code rather than data, so it cannot be exported from the TypeScript and

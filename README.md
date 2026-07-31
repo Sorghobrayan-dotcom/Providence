@@ -111,6 +111,17 @@ from.
 
 Nothing in the viewport is scripted. It imports the same library the tests run.
 
+Two of the controls are yours rather than the world's, and they are keys rather
+than toggles: <kbd>S</kbd> asks him, <kbd>K</kbd> shows a kindness where he can
+see it. Asking is the whole of Peter's opening and the whole of the judge;
+kindness is the only road back from Peter's denial and the only thing that moves
+Ruth at all.
+
+The line under the figure says what he is doing in plain words and what to press
+next. It is written per node in `src/editor/Cues.ts`, a cue may only name a
+control that exists, and a test enforces that — see
+[docs/driving-it.md](docs/driving-it.md) for the same thing on paper.
+
 The inspector has four tabs. **Soul** is the arc and its disposition. **Relations**
 draws the graph, lets you commit deeds against it, and prints the ledger.
 **Place** moves the character between atmospheres. **Grace** shows the running
@@ -179,7 +190,7 @@ TypeScript and re-read: it has to be written again. See `godot/README.md`.
 npm test
 ```
 
-362 of them. The ones worth reading first are in
+377 of them. The ones worth reading first are in
 `src/__tests__/providenceIntegrity.test.ts`, which assert the claims this project
 makes about itself, and `providenceEndToEnd.test.ts`, which runs one story
 through every part of the engine at once and calls the real platform.
@@ -204,6 +215,7 @@ ally, however many lines you give it.
 | [docs/grace.md](docs/grace.md) | the grace specification, written before the code |
 | [docs/archetypes.md](docs/archetypes.md) | per-arc sheets, generated from the library |
 | [docs/deploying.md](docs/deploying.md) | the Scripture proxy and what it refuses |
+| [docs/driving-it.md](docs/driving-it.md) | how to drive the editor: six characters, five minutes |
 | [docs/review.md](docs/review.md) | an honest audit, including what does not hold up |
 | [docs/writeup.md](docs/writeup.md) | the submission writeup |
 | [docs/cover.html](docs/cover.html) | the cover image, and the page it renders from |

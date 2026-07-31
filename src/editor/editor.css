@@ -188,14 +188,57 @@ button:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
 /* ---------- viewport: the one place with colour ---------- */
 .viewport { grid-area: viewport; background: #050505; position: relative; overflow: hidden; }
 canvas { display: block; width: 100%; height: 100%; }
-.viewport-hint {
+/* The cue. What he is doing, and what you can press about it.
+
+   It sits inside the viewport rather than in a dock because it is about the
+   figure standing there, and a reader should not have to look away from him to
+   find out what he is. Bottom-anchored over a fade, so it never covers the
+   feet and never fights the 3D for attention. */
+.cue {
   position: absolute;
-  left: 13px; bottom: 11px;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--ink-4);
+  left: 0; right: 0; bottom: 0;
+  padding: 26px 15px 13px;
+  background: linear-gradient(to top, rgba(0, 0, 0, .93) 40%, rgba(0, 0, 0, 0));
   pointer-events: none;
 }
+.cue-doing {
+  font-size: 13.5px;
+  line-height: 1.4;
+  color: var(--ink);
+  max-width: 74ch;
+}
+.cue-next {
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-3);
+  max-width: 74ch;
+}
+.cue-next b {
+  font-weight: 400;
+  color: var(--ink-2);
+  border-bottom: 1px solid var(--edge-bright);
+}
+
+/* A key cap, in the toolbar and in the cue, so the two read as the same thing. */
+kbd {
+  font-family: var(--mono);
+  font-size: 10px;
+  line-height: 1;
+  padding: 3px 5px 2px;
+  color: var(--ground);
+  background: var(--ink);
+  border-radius: 2px;
+}
+
+/* The two things the player does, as opposed to the eleven the world is. */
+.flag.verb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-color: var(--edge-bright);
+}
+.flag.verb .count { color: var(--ink-4); }
 
 /* ---------- inspector ---------- */
 .tabs { display: flex; border-bottom: 1px solid var(--edge); flex: 0 0 auto; }

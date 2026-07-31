@@ -18,6 +18,7 @@ import { headingFor, spaceFor, wayFor } from '../providence/ways';
 import type { Occasion } from '../providence/Utterance';
 import { METRES_PER_UNIT } from './Stage3D';
 import { memoryFor } from '../providence/memory';
+import { cueFor, plainly } from './Cues';
 
 /**
  * The Providence editor.
@@ -84,7 +85,10 @@ root.innerHTML = `
 
   <main class="viewport">
     <canvas id="stage"></canvas>
-    <div class="viewport-hint">drag to move the player &middot; toggles above drive the world</div>
+    <div class="cue">
+      <div class="cue-doing" id="cue-doing"></div>
+      <div class="cue-next" id="cue-next"></div>
+    </div>
   </main>
 
   <aside class="dock inspector">
@@ -160,12 +164,23 @@ let clock = 0;
 
 function selectArc(next: Arc): void {
   arc = next;
+  /* Into the graph before the Actor is built, because the Actor reads its
+     memory of the player out of it by this id. A character absent from the
+     graph looks up a name that is not there and is handed the blank memory of
+     a stranger, which is how betraying somebody used to leave everyone except
+     Peter completely unmoved. Sworn to you if the arc is about standing toward
+     the player; a stranger otherwise, since a covenant with Goliath is a claim
+     the library never makes. */
+  const sworn = RELATIONSHIP_ARCS.some((a) => a.id === next.id);
+  relations.focus(next.id, sworn ? 'covenant' : 'stranger');
+  restate();
   actor = new Actor(next, memoryFor(relations.graph, next.id));
   actor.standsIn(places.place);
   position = { x: 0.28, y: 0.42 };
   clock = 0;
   stage.setArc(next);
   renderLibrary();
+  renderCue();
   note(`loaded ${next.id}`, next.source);
 }
 
@@ -217,32 +232,58 @@ for (const flag of FLAGS) {
   flagsEl.appendChild(button);
 }
 
-// the judge and the widow both need a counter, so give the toolbar one
+/* Asking and being kind are the two things the player *does*, as opposed to the
+   eleven things the world merely is, so they are keys rather than another pair
+   of grey pills in the same row. It also fixes the thing that made the tool
+   unreadable: you walk up to someone and press S, which is what a person
+   expects, instead of hunting a toolbar for a counter called "ask again". */
 const asked = document.createElement('button');
-asked.className = 'flag';
+asked.className = 'flag verb';
 asked.type = 'button';
 const renderAsked = (): void => {
-  asked.textContent = `ask again (${world.requestsMade})`;
+  asked.innerHTML = `<kbd>S</kbd> ask <span class="count">${world.requestsMade}</span>`;
 };
-asked.addEventListener('click', () => {
+const ask = (): void => {
   world.requestsMade += 1;
   renderAsked();
+  note(`asked, from ${world.distanceToPlayer.toFixed(1)} m (${world.requestsMade} in all)`, 'LUK.18.3');
+};
+asked.addEventListener('click', () => {
+  ask();
+  asked.blur();
 });
 renderAsked();
 flagsEl.appendChild(asked);
 
 const kind = document.createElement('button');
-kind.className = 'flag';
+kind.className = 'flag verb';
 kind.type = 'button';
 const renderKind = (): void => {
-  kind.textContent = `show kindness (${world.kindnessesWitnessed})`;
+  kind.innerHTML = `<kbd>K</kbd> show kindness <span class="count">${world.kindnessesWitnessed}</span>`;
 };
-kind.addEventListener('click', () => {
+const beKind = (): void => {
   world.kindnessesWitnessed += 1;
   renderKind();
+  note(`kindness shown, and witnessed (${world.kindnessesWitnessed} in all)`, 'RUT.2.11');
+};
+kind.addEventListener('click', () => {
+  beKind();
+  kind.blur();
 });
 renderKind();
 flagsEl.appendChild(kind);
+
+window.addEventListener('keydown', (e) => {
+  // the console has a search box, and a viewer typing "steadfast" into it is
+  // not asking anybody for anything
+  const target = e.target as HTMLElement | null;
+  if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+  const key = e.key.toLowerCase();
+  if (key === 's') ask();
+  else if (key === 'k') beKind();
+});
 
 /* ------------------------------------------------------------------ */
 /* Console                                                             */
@@ -339,6 +380,34 @@ function field(name: string, build: (host: HTMLElement) => void): HTMLElement {
   return wrap;
 }
 
+/* ------------------------------------------------------------------ */
+/* Cue                                                                 */
+/* ------------------------------------------------------------------ */
+
+const cueDoingEl = document.getElementById('cue-doing') as HTMLElement;
+const cueNextEl = document.getElementById('cue-next') as HTMLElement;
+let cueShown = '';
+
+/** Mark up the controls a cue names, so the eye finds them before the sentence. */
+function markControls(instruction: string): string {
+  const escaped = instruction.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c] as string);
+  return escaped
+    .replace(/\b(S|K)\b/g, '<kbd>$1</kbd>')
+    .replace(
+      /\b(under threat|danger ahead|atrocity imminent|player returning|player succeeding|player suffering|under pressure|path blocked|spoil unguarded|observed|deceived|Relations|Place|Grace)\b/g,
+      '<b>$1</b>',
+    );
+}
+
+function renderCue(): void {
+  const cue = cueFor(arc.id, actor.state, actor.directive);
+  const stamp = `${cue.doing} ${cue.next}`;
+  if (stamp === cueShown) return;
+  cueShown = stamp;
+  cueDoingEl.textContent = cue.doing;
+  cueNextEl.innerHTML = markControls(cue.next);
+}
+
 function renderInspector(): void {
   if (panel === 'relations') {
     if (inspectorEl.firstChild !== relations.root) inspectorEl.replaceChildren(relations.root);
@@ -375,6 +444,13 @@ function renderInspector(): void {
     v.className = 'field-value';
     v.textContent = actor.state;
     h.appendChild(v);
+
+    /* The node id is the engine's word for it. `shrinking` is precise and it
+       tells a first-time reader nothing, so the same thing is said twice. */
+    const said = document.createElement('div');
+    said.className = 'solves';
+    said.textContent = plainly(actor.directive);
+    h.appendChild(said);
   }));
 
   frag.appendChild(field('disposition', (h) => {
@@ -531,6 +607,7 @@ function frame(now: number): void {
   ]);
 
   stage.render(dt, actor.directive, actor.disposition, actor.bears, weather, player, position, errand);
+  renderCue();
   renderInspector();
   refreshApiState();
   requestAnimationFrame(frame);
@@ -544,10 +621,9 @@ relations.reports((summary, because) => {
   restate();
   void report('graph', 'graph', summary, because);
 });
-restate();
-actor.standsIn(places.place);
-
-renderLibrary();
-stage.setArc(arc);
+/* Through the same door every other load goes through, so the character the
+   editor opens on is bound into the graph like any other. Setting it up by hand
+   here is how the first arc ended up being the one arc with no memory. */
+selectArc(arc);
 note('providence editor ready', 'GEN.1.1');
 requestAnimationFrame(frame);
