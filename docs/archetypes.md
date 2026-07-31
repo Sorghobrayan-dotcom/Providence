@@ -194,12 +194,11 @@ Starting disposition: trust 0.4, fear 0, resolve 0.9.
 
 | state | intends | drifts | goes to |
 | --- | --- | --- | --- |
-| `coiled` | hold · watching | — | `questioning` (GEN.3.1) |
-| `questioning` | hold · questioning · offering | — | `reframing` (GEN.3.4) |
+| `coiled` | toward-player · watching | — | `questioning` (GEN.3.1) |
+| `questioning` | toward-player · questioning · offering | — | `reframing` (GEN.3.4) |
 | `reframing` | hold · offering · offering | trust +0.04/s | `withdrawn` (GEN.3.6) |
-| `withdrawn` | away-from-player · gone | — | *end* |
+| `withdrawn` | away-from-player · gone | — | `coiled` (LUK.4.13) |
 
-Ends in `withdrawn`.
 
 ### La Reddition Fausse  `pharaoh`
 

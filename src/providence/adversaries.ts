@@ -23,7 +23,11 @@ export const SERPENT: Arc = {
   nodes: [
     {
       id: 'coiled',
-      directive: { move: 'hold', posture: 'watching' },
+      /* It closes rather than waits. Holding here made it a trap the player had
+         to walk into, and left the flanking way written for it in ways.ts
+         unreachable - the one thing it does, arrive from an angle you were not
+         watching, could never happen. */
+      directive: { move: 'toward-player', posture: 'watching' },
       transitions: [
         {
           /* It comes closer, sooner, to someone already carrying a grievance.
@@ -38,8 +42,9 @@ export const SERPENT: Arc = {
     },
     {
       id: 'questioning',
-      // it does not lie yet, it only asks whether the rule is really the rule
-      directive: { move: 'hold', posture: 'questioning', offering: true },
+      // it does not lie yet, it only asks whether the rule is really the rule,
+      // and it is still closing while it asks
+      directive: { move: 'toward-player', posture: 'questioning', offering: true },
       transitions: [
         {
           to: 'reframing',
@@ -67,7 +72,18 @@ export const SERPENT: Arc = {
       id: 'withdrawn',
       // it leaves the moment the player acts, and is never there for the consequence
       directive: { move: 'away-from-player', posture: 'gone' },
-      transitions: [],
+      transitions: [
+        {
+          /* And it comes back. A tempter that suggests once and is done for the
+             session is a cutscene; this one returns the moment there is enough
+             distance to approach across again, which is what makes it a
+             presence in the world rather than an event in it. */
+          to: 'coiled',
+          when: (c) => c.world.distanceToPlayer > 10,
+          because: 'LUK.4.13',
+          note: 'le diable se retira de lui jusqu a un moment favorable',
+        },
+      ],
     },
   ],
 };
