@@ -30,3 +30,6 @@ art-drop
 # key files, in any form
 .env.*
 !.env.example
+
+# Godot writes its import cache here; it is not source.
+godot/.godot

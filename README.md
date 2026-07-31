@@ -215,12 +215,23 @@ does not really have rules.
 
 ## Godot
 
-`godot/addons/providence/` holds a GDScript port. Copy it into a Godot 4 project
-and enable the plugin; it registers a `Providence` autoload.
+`godot/` is a Godot 4 project holding a GDScript port and the check that proves
+it runs. Copy `addons/providence/` into your own project and enable the plugin;
+it registers a `Providence` autoload.
 
-Four arcs ship there rather than all 21. Each transition carries a condition, and
-a condition is code rather than data, so it cannot be exported from the
-TypeScript and re-read: it has to be written again. See `godot/README.md`.
+```
+godot --headless --editor --quit-after 60 --path godot
+godot --headless --path godot --script res://check.gd
+```
+
+41 assertions, passing on 4.7.1. Peter breaks under threat after eight seconds
+and refuses two kindnesses before the third brings him back, which is the same
+number the TypeScript suite reports.
+
+Four arcs ship there rather than all 24. In the TypeScript a condition is a
+closure that may read the relation graph or the player's standing, and none of
+that serialises; what the port has instead is a twelve-word tagged vocabulary,
+enough for these four and not for the other twenty. See `godot/README.md`.
 
 ---
 

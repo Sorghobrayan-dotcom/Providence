@@ -2,10 +2,13 @@ extends RefCounted
 class_name ProvidenceArcs
 
 ## Behaviour arcs, ported from the TypeScript library that the test suite
-## exercises. Four are shipped here rather than all twenty one, because each
-## transition carries a CONDITION, and a condition is code: it cannot be
-## serialised out of the TypeScript and re-read here, it has to be written in
-## GDScript. Four was chosen to cover the four distinct shapes:
+## exercises. Four are shipped here rather than all twenty four, and the precise
+## reason matters: in the TypeScript a condition is a closure that may read the
+## relation graph, the player's standing before the Law, or how many times this
+## character has already stood where it is standing. None of that serialises.
+## What replaces it here is the small tagged vocabulary `actor.gd` understands —
+## twelve conditions, enough to express these four arcs exactly and not enough
+## for the other twenty. Four covers four distinct shapes:
 ##
 ##   peter    a bond that breaks and can be repaired
 ##   jonah    a giver who flees the errand he was given

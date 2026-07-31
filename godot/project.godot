@@ -1,0 +1,15 @@
+; A project whose only purpose is to hold the addon and the check that proves it
+; works. Open this folder in Godot 4 and the plugin is already enabled; run
+; check.gd headless and it asserts the behaviour without opening a window.
+
+config_version=5
+
+[application]
+
+config/name="Providence — addon"
+config/description="A moral physics layer. Your engine knows where the body falls; this knows what it costs."
+config/features=PackedStringArray("4.4")
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/providence/plugin.cfg")

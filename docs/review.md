@@ -101,6 +101,23 @@ went on passing against the stale copy. `Soul` proves it had already happened �
 in the vocabulary, missing from the markup, so every cue sending a reader to that
 tab has failed to highlight it for as long as those cues have existed.
 
+**The Godot addon has been run.** It was written, reviewed and shipped, and for
+a long time nobody had opened Godot once — which is why the phrasing everywhere
+was "a GDScript port" and never anything stronger. `godot/` is now a project and
+`godot/check.gd` is 41 assertions against it, passing on 4.7.1: every arc whole
+and cited, Peter breaking at eight seconds and refusing two kindnesses before
+the third brings him back, the donkey overruling the rider, the serpent hostile
+in no state at all, and the same drift at any frame rate.
+
+Two things came out of running it. `providence.gd` types its return as
+`ProvidenceActor`, a global class name Godot resolves from a cache the editor
+builds and `.gitignore` excludes, so on a fresh clone the addon will not compile
+from a script alone — the editor has to be opened once, which is documented now
+rather than discovered. And the plugin's autoload appeared to fail: it does not.
+A three-line control plugin making the identical call behaves identically, and
+one explicit `ProjectSettings.save()` writes both entries at once. Headless
+`--quit-after` simply exits before the editor saves its settings.
+
 **`npm test` no longer edits the repository.** The suite regenerated
 `docs/archetypes.md` as a side effect, which kept the sheets from drifting and
 also hid the drift it existed to catch: the file was fixed before anyone was told
@@ -137,13 +154,13 @@ printed `1KI.18.21` under his own words, which is precisely the failure this
 project names in its own writeup. Only Scripture is cited now. His words stand
 without a reference and the console keeps it, labelled as telemetry.
 
-**Godot ships 4 arcs, not 24.** A transition holds a predicate, and a predicate
-is code rather than data, so it cannot be exported from the TypeScript and
-re-read. Each one has to be written again by hand. The README says so, but a
-reader could reasonably expect parity.
-
-**Nobody has run the Godot addon.** It is written and it is plausible, and that is
-not the same as working. Neither of us has opened Godot.
+**Godot ships 4 arcs, not 24.** In the TypeScript a condition is a closure that
+may read the relation graph, the player's standing, or how many times the
+character has already stood where it is standing, and none of that serialises.
+The port replaces it with a twelve-word tagged vocabulary, which expresses these
+four exactly and the other twenty not at all. The README used to say a condition
+is code and therefore cannot be data — which the port itself contradicts, since
+it *is* data there. Widening the vocabulary is the work.
 
 **The 482 kB of Three.js is the whole viewport budget.** Fine on a laptop, poor
 on a phone over a Burkinabè mobile connection, which is exactly the audience the
@@ -162,10 +179,10 @@ pointing somewhere else is a cost paid by every reader.
 
 ## Proposals, ranked by value for the effort
 
-**1. Open Godot once and run the addon.** An hour, and it converts a plausible
-claim into a true one. Until that happens the honest phrasing in the writeup is
-"a GDScript port" rather than anything stronger. It is now the only claim in the
-repository that nothing has ever executed.
+**1. Widen the Godot condition vocabulary.** Twelve tagged conditions carry four
+arcs. Most of the other twenty need only two or three more — a comparison
+against the graph, and a visit count. It is the difference between a sample and
+a port.
 
 **2. Lazy-load the viewport.** The editor is usable without Three.js: the
 library, the graph, the places and grace all work in the panels. Load the 3D
