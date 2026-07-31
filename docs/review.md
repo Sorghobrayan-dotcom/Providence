@@ -9,8 +9,8 @@ than a day.
 
 | | |
 | --- | --- |
-| engine | 4,998 lines across 20 modules |
-| tests | 5,261 lines, 427 assertions in 31 files |
+| engine | 5,228 lines across 21 modules |
+| tests | 5,393 lines, 438 assertions in 32 files |
 | editor | 3,215 lines, 108 assertions in 7 files |
 | notebook | 47 cells, 25 of them executable, all passing |
 | bundle | 59 kB for the editor, 482 kB for Three.js |
@@ -64,6 +64,17 @@ more: `requestsMade` and `kindnessesWitnessed` survived a change of character, s
 everyone after the first arrived already asked and already credited with a
 kindness shown to somebody else.
 
+**They no longer all speak in the same voice.** The prompt carried the structure
+and nothing else — which node, how afraid, what the player's record says — which
+is enough for a plausible line and nowhere near enough for a particular man's.
+Eight portraits now go with it: register, wound, desire, what he will not do
+whatever happens, and how he reads the same public record. Every claim carries
+the passage it is read from and a test insists on it, because a portrait is a
+reading rather than characterisation we invented. Asked the same question, the
+fugitive answers `Tu voulais quoi, toi, en fuyant ?` and the judge answers
+`Encore toi ? Le juge ne change pas d'avis parce qu'on frappe deux fois à sa
+porte`.
+
 ## What does not hold up
 
 **`main.ts` and `Stage3D.ts` still have no tests.** This was the worst thing on
@@ -75,6 +86,16 @@ the boot path that set the first arc up by hand, the cast that left it out of
 the graph, the three from the conversation above, and the two counters that
 survived a load. It is now the largest untested file in the repository by some
 distance, and it grew again this week.
+
+**Sixteen of the twenty four have no portrait.** They are listed by hand in
+`PENDING` and the suite fails if an arc is neither written nor listed, so it is a
+backlog rather than a hole. But the fallback has a failure mode worth naming:
+without a portrait the model leans on the one piece of character it was given,
+which is the passage behind the change, and paraphrases it. Goliath's first line
+was very nearly 1 Samuel 17:10 back at us. Telling the prompt that the arc's
+label is a designer's shelf-name and not his own stopped the worst of it — the
+judge had been introducing himself as *Le Juge Lasse* — but a portrait is the
+real fix and sixteen are missing.
 
 **Godot ships 4 arcs, not 24.** A transition holds a predicate, and a predicate
 is code rather than data, so it cannot be exported from the TypeScript and

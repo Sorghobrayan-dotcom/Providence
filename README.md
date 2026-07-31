@@ -177,6 +177,18 @@ function.
 
 ### Gloo
 
+Gloo gives the characters their own words, out of the structure and never out of
+a script: this arc, this node, what just changed, what he is carrying, and who is
+standing in front of him. `src/providence/portraits.ts` supplies the other half —
+his register, his wound, what he wants, and the things he will not do whatever
+the player tries — and every line of it carries the passage it is read from. Ask
+the fugitive and the judge the same question and they no longer answer in the
+same voice. Sixteen of the twenty four are still without a portrait; they are
+listed by hand, and the suite fails if an arc is neither written nor listed.
+
+He is forbidden to quote or paraphrase Scripture, and when no line comes back he
+says nothing at all.
+
 Gloo advises, Providence decides. When a developer declares an action the engine
 does not recognise, `Interpreter.ts` tries its own rules first, asks the model
 only if it still cannot tell, then checks the answer before accepting it. A
@@ -206,7 +218,7 @@ TypeScript and re-read: it has to be written again. See `godot/README.md`.
 npm test
 ```
 
-427 of them. The ones worth reading first are in
+438 of them. The ones worth reading first are in
 `src/__tests__/providenceIntegrity.test.ts`, which assert the claims this project
 makes about itself, and `providenceEndToEnd.test.ts`, which runs one story
 through every part of the engine at once and calls the real platform.

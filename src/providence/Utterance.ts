@@ -1,6 +1,7 @@
 import type { Arc, Directive, Disposition } from './types';
 import type { Covenant } from './covenant';
 import { conditionOf, strainOf, type Standing } from './standing';
+import { portraitFor } from './portraits';
 
 /**
  * What the character says, generated from the structure rather than written.
@@ -168,10 +169,32 @@ export function promptFor(occasion: Occasion): Message[] {
       ? 'Écris son refus, avec ses mots à lui. Il n\'explique aucune règle et ne plaide pas longuement.'
     : 'Écris sa réplique.';
 
+  /* Who is talking, as opposed to what just happened to him. Absent for the
+     arcs with no portrait yet, and those keep the register they always had
+     rather than being handed an invented one. */
+  const portrait = portraitFor(arc.id);
+  const who = portrait
+    ? [
+        `Sa voix : ${portrait.voice}`,
+        `Sa blessure : ${portrait.wound.what}`,
+        `Ce qu'il veut vraiment : ${portrait.desire.what}`,
+        `Ce qu'il ne fera jamais, quoi qu'on lui dise : ${portrait.never.map((n) => n.what).join(' ')}`,
+        portrait.manners.length > 0
+          ? `Habitudes de parole, permises et non obligatoires : ${portrait.manners.join(' ; ')}.`
+          : '',
+      ].filter((l) => l !== '')
+    : [];
+
   const lines = [
     `Personnage : ${arc.label} (${arc.source}).`,
+    /* The label is a designer's shelf-name and the model will use it as one if
+       nobody says otherwise: the judge introduced himself, out loud, as "Le
+       Juge Lasse". */
+    `(« ${arc.label} » est le nom que lui donne le concepteur, pas le sien. Il ne le prononce jamais.)`,
     `Ce qu'il résout dans le jeu : ${arc.solves}`,
     '',
+    ...who,
+    ...(who.length > 0 ? [''] : []),
     ...happening,
     `Ce qu'il fait à l'instant : ${directive.posture}, il ${moveInWords(directive.move)}.`,
     directive.refusing ? 'Il refuse ce qu\'on lui demande.' : '',
@@ -183,6 +206,11 @@ export function promptFor(occasion: Occasion): Message[] {
       : '',
     '',
     `Devant lui : ${asker}.`,
+    /* The same public record, read by this particular man. `Eyes` in
+       covenant.ts moves his disposition on it; this says what it means to him,
+       and the two must agree — a portrait whose reading contradicts its eyes is
+       a character arguing with itself. */
+    portrait ? `Ce que cela lui fait : ${portrait.reading[covenant.standing]}` : '',
     '',
     reason,
     occasion.passage ? `Ce passage dit : « ${occasion.passage} »` : '',
