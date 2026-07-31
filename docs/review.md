@@ -10,8 +10,8 @@ than a day.
 | | |
 | --- | --- |
 | engine | 5,228 lines across 21 modules |
-| tests | 5,514 lines, 450 assertions in 33 files |
-| editor | 3,436 lines, 120 assertions in 8 files |
+| tests | 5,816 lines, 476 assertions in 35 files |
+| editor | 3,561 lines, 145 assertions in 10 files |
 | notebook | 47 cells, 25 of them executable, all passing |
 | bundle | 59 kB for the editor, 482 kB for Three.js |
 
@@ -84,17 +84,38 @@ a tour is the anchor — rename a zone and it goes on highlighting nothing — s
 test reads the editor's own source and fails on a selector that is no longer in
 it.
 
+**The arithmetic is out of the frame loop, and one list is one list.** Movement —
+how fast, on what line, how close it is willing to get, what happens when the
+ground runs out — lived in `main.ts` where it could not be called twice, and all
+four parts of it had been wrong at some point without anything going red. It is
+in `Motion` now with fifteen assertions, including the scale that made every node
+gated at three metres unreachable. Separately, the toolbar, the cue check and the
+cue markup each kept their own hand-typed copy of the control names: rename a
+toggle and only the toolbar followed, while the check that exists to catch that
+went on passing against the stale copy. `Soul` proves it had already happened —
+in the vocabulary, missing from the markup, so every cue sending a reader to that
+tab has failed to highlight it for as long as those cues have existed.
+
+**`npm test` no longer edits the repository.** The suite regenerated
+`docs/archetypes.md` as a side effect, which kept the sheets from drifting and
+also hid the drift it existed to catch: the file was fixed before anyone was told
+it was wrong. The default is now to compare and fail with the command to run;
+`npm run docs` writes.
+
 ## What does not hold up
 
 **`main.ts` and `Stage3D.ts` still have no tests.** This was the worst thing on
 the list and most of it is now closed: `Bearing`, `Speech`, the console, the
-logo, the cues, the relation panel, the encounter and the verbs carry 108
-assertions between them. What is left is the 1,406 lines of wiring in `main.ts`
-and the viewport, and the wiring is where every remaining bug has been found —
-the boot path that set the first arc up by hand, the cast that left it out of
-the graph, the three from the conversation above, and the two counters that
-survived a load. It is now the largest untested file in the repository by some
-distance, and it grew again this week.
+logo, the cues, the relation panel, the encounter, the verbs, the tour, the
+controls and the movement carry 145 assertions between them. Every extraction
+was made because the code being pulled out had already been wrong once.
+
+What is left is the 1,352 lines of `main.ts` and the viewport, and it is now
+genuinely wiring: which element to write into, which listener to hang, what to
+call on a frame. The arithmetic is out. That is still the largest untested file
+in the repository and still where every remaining bug has been found — the boot
+path that set the first arc up by hand, the cast that left it out of the graph,
+the three from the conversation, and the two counters that survived a load.
 
 **Sixteen of the twenty four have no portrait.** They are listed by hand in
 `PENDING` and the suite fails if an arc is neither written nor listed, so it is a
@@ -129,16 +150,11 @@ world running for months would grow without bound and nothing compacts it.
 the library. The README explains it honestly, but a third of the repository
 pointing somewhere else is a cost paid by every reader.
 
-**One test writes a file.** `archetypeSheets.test.ts` regenerates
-`docs/archetypes.md` as a side effect of running the suite. It works and it keeps
-the sheets from drifting, but a test that mutates the working tree is not really a
-test, and `npm test` should not leave the repository dirty.
-
 ## Proposals, ranked by value for the effort
 
-**1. Test the editor panels.** Extract the graph layout and the deed handling from
-the DOM and cover them, the way `Bearing` and the console already are. The last
-1,204 lines with no net, and still the highest value per hour on this list.
+**1. Cover the panels.** The relation panel has its cast tested and the graph
+layout, the deed buttons and the place notes do not. It is the last real
+arithmetic left in the editor with nothing under it.
 
 **2. Open Godot once and run the addon.** An hour, and it converts a plausible
 claim into a true one. Until that happens the honest phrasing in the writeup is
@@ -149,9 +165,9 @@ library, the graph, the places and grace all work in the panels. Load the 3D
 scene on demand and the first paint drops from 541 kB to 59. This matters most for
 the audience the project keeps invoking.
 
-**4. Make the sheet generation a script, not a test.** Move it to
-`npm run docs`, and have the test assert the committed file matches what would be
-generated. Same protection against drift, without a test that writes to disk.
+**4. Write the sixteen remaining portraits.** Not for completeness: an arc
+without one leans on the passage it was handed and paraphrases it, which is the
+one thing this project must not be caught doing.
 
 **5. Bound the traversal in `house()`.** A depth limit with a decay per hop, so
 bloodguilt reaching a grandchild costs less than reaching a son. Small change,

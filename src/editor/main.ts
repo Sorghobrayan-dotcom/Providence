@@ -10,15 +10,16 @@ import { Stage3D } from './Stage3D';
 import { GracePanel, PlacePanel, RelationPanel } from './panels';
 import { ScriptureConsole, type Channel } from './console';
 import { brandTab, LivePlumbLine } from './logo';
-import { approachFor, paceFor } from './Bearing';
+import { stepped } from './Motion';
 import { GlooVoice } from '../api/GlooVoice';
 import { covenantOf, NO_COVENANT } from '../providence/covenant';
 import { gather, situationsIn, testimonyOf } from '../providence/testimony';
-import { evading, headingFor, spaceFor, wayFor } from '../providence/ways';
+import { wayFor } from '../providence/ways';
 import type { Occasion } from '../providence/Utterance';
 import { METRES_PER_UNIT } from './Stage3D';
 import { memoryFor } from '../providence/memory';
 import { cueFor, plainly } from './Cues';
+import { FLAGS, markControls } from './Controls';
 import { Encounter, type EncounterState } from './Encounter';
 import { Tour, type Step } from './Tour';
 import { verbsFor, type Verb } from './Verbs';
@@ -33,20 +34,6 @@ import { verbsFor, type Verb } from './Verbs';
  */
 
 type World = Omit<WorldView, 'timeInNode'>;
-
-const FLAGS: readonly { key: keyof World; label: string }[] = [
-  { key: 'underThreat', label: 'under threat' },
-  { key: 'dangerAhead', label: 'danger ahead' },
-  { key: 'atrocityImminent', label: 'atrocity imminent' },
-  { key: 'playerSucceeding', label: 'player succeeding' },
-  { key: 'playerReturning', label: 'player returning' },
-  { key: 'playerSuffering', label: 'player suffering' },
-  { key: 'observedByOthers', label: 'observed' },
-  { key: 'pathBlocked', label: 'path blocked' },
-  { key: 'underPressure', label: 'under pressure' },
-  { key: 'playerDeceived', label: 'deceived' },
-  { key: 'spoilUnguarded', label: 'spoil unguarded' },
-];
 
 const GROUPS: readonly { name: string; arcs: readonly Arc[] }[] = [
   { name: 'Relationship', arcs: RELATIONSHIP_ARCS },
@@ -466,20 +453,10 @@ const cueDoingEl = document.getElementById('cue-doing') as HTMLElement;
 const cueNextEl = document.getElementById('cue-next') as HTMLElement;
 let cueShown = '';
 
-/** Mark up the controls a cue names, so the eye finds them before the sentence. */
-function markControls(instruction: string): string {
-  const escaped = instruction.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c] as string);
-  return escaped
-    .replace(/\b(S|K)\b/g, '<kbd>$1</kbd>')
-    .replace(
-      /\b(under threat|danger ahead|atrocity imminent|player returning|player succeeding|player suffering|under pressure|path blocked|spoil unguarded|observed|deceived|Relations|Place|Grace)\b/g,
-      '<b>$1</b>',
-    );
-}
-
 function renderCue(): void {
   const cue = cueFor(arc.id, actor.state, actor.directive);
-  const stamp = `${cue.doing} ${cue.next}`;
+  const stamp = `${cue.doing}
+${cue.next}`;
   if (stamp === cueShown) return;
   cueShown = stamp;
   cueDoingEl.textContent = cue.doing;
@@ -805,54 +782,23 @@ canvas.addEventListener('pointerup', () => {
 });
 
 /** Move the actor according to the directive the library returned. */
+/**
+ * Move the body according to the directive the library returned.
+ *
+ * The arithmetic lives in `Motion` so it can be called twice and asserted. Every
+ * bug it ever had — the scale, the two bodies rendering as one, the mirror that
+ * pinned a fleeing man to a wall — was invisible on the page and would have been
+ * one line of a test.
+ */
 function applyDirective(dt: number): void {
-  // where it goes is the library's call; how urgently it gets there is what it
-  // feels about going, which is the whole point of the disposition
-  const speed = 0.16 * dt * paceFor(actor.disposition, actor.directive.move, clock);
-
-  /* Fleeing is its own problem and it is not the mirror it used to be. A body
-     walking at the player's reflection walks into the wall behind it, clamps,
-     and is collected by anyone strolling after it — so Jonah did not flee, he
-     parked in a corner. `evading` picks the heading that keeps leaving with
-     ground still under him, and returns the mirror untouched in the open. */
-  if (actor.directive.move === 'away-from-player' || actor.directive.move === 'away-from-errand') {
-    const after = actor.directive.move === 'away-from-player' ? player : errand;
-    const heading = evading(position, after, FIELD, LOOKAHEAD);
-    position.x = Math.max(FIELD.minX, Math.min(FIELD.maxX, position.x + Math.cos(heading) * speed));
-    position.y = Math.max(FIELD.minY, Math.min(FIELD.maxY, position.y + Math.sin(heading) * speed));
-    return;
-  }
-
-  const target =
-    actor.directive.move === 'toward-player' ? player :
-    actor.directive.move === 'toward-errand' ? errand :
-    null;
-
-  if (!target) return;
-
-  const dx = target.x - position.x;
-  const dy = target.y - position.y;
-  const gap = Math.hypot(dx, dy);
-  if (gap < 1e-6) return;
-
-  /* Stop at arm's length instead of at the other body's exact coordinates.
-     Without this the actor walks clean through the player and the two of them
-     render as a single figure — which is what was on screen. How far out it
-     stops is the character's business: a companion who trusts you comes to your
-     shoulder, one who does not keeps the length of a room. */
-  /* How it goes, as distinct from where. The directive already picked the
-     destination; the way bends the line taken to it and straightens on arrival,
-     so a serpent and a giant close the same gap differently. Most arcs have no
-     way and this is the identity. */
-  const way = wayFor(arc.id);
-
-  const keep = spaceFor(way, approachFor(actor.disposition, actor.directive.move)) / METRES_PER_UNIT;
-  const step = Math.min(speed, Math.max(0, gap - keep));
-  if (step <= 0) return;
-
-  const heading = headingFor(way, Math.atan2(dy, dx), clock, gap * METRES_PER_UNIT);
-  position.x = Math.max(FIELD.minX, Math.min(FIELD.maxX, position.x + Math.cos(heading) * step));
-  position.y = Math.max(FIELD.minY, Math.min(FIELD.maxY, position.y + Math.sin(heading) * step));
+  position = stepped(
+    actor.directive,
+    actor.disposition,
+    wayFor(arc.id),
+    { at: position, player, errand, field: FIELD, metresPerUnit: METRES_PER_UNIT, lookahead: LOOKAHEAD },
+    dt,
+    clock,
+  );
 }
 
 /* ------------------------------------------------------------------ */

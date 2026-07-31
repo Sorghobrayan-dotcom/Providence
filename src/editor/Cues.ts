@@ -28,30 +28,11 @@ export interface Cue {
   readonly next: string;
 }
 
-/** Every control a cue is allowed to name. A test checks each cue against it. */
-export const CONTROLS: readonly string[] = [
-  'S', 'K',
-  'under threat', 'danger ahead', 'atrocity imminent', 'player succeeding',
-  'player returning', 'player suffering', 'observed', 'path blocked',
-  'under pressure', 'deceived', 'spoil unguarded',
-  'Relations', 'Place', 'Grace', 'Soul',
-  'drag', 'walk', 'wait', 'nothing',
-];
-
-/**
- * Does this instruction name something a viewer can actually press?
- *
- * The two key bindings are single letters, so they are matched case-sensitively
- * and on a word boundary: lowercase `s` occurs in nearly every English sentence
- * ever written, and a check that accepts it checks nothing. Everything else is
- * a phrase, and a phrase is allowed to start a sentence in capitals.
- */
-export function namesAControl(instruction: string): boolean {
-  return CONTROLS.some((control) => {
-    const boundary = new RegExp(`\\b${control}\\b`, control.length === 1 ? '' : 'i');
-    return boundary.test(instruction);
-  });
-}
+/* The names live in Controls, beside the toolbar that builds them and the
+   routine that marks them up, because three hand-kept copies of one list is one
+   list and two rumours. Re-exported so a cue and its vocabulary still read as
+   one thing from the outside. */
+export { CONTROLS, namesAControl } from './Controls';
 
 const MOVE: Record<Directive['move'], string> = {
   'toward-player': 'coming toward you',

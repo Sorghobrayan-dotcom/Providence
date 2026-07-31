@@ -1,4 +1,4 @@
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { LIBRARY, RELATIONSHIP_ARCS } from '../providence/arcs';
@@ -173,14 +173,39 @@ describe('every arc is fit to publish', () => {
     expect(counted.sort()).toEqual(LIBRARY.map((a) => a.id).sort());
   });
 
-  it('writes the sheets out', () => {
+  it('generates a sheet for every family and both tables', () => {
     const text = document();
-    writeFileSync(join(__dirname, '..', '..', 'docs', 'archetypes.md'), text, 'utf8');
     // spot-check one arc per family, plus both generated tables
     expect(text).toContain('balaams-donkey');
     expect(text).toContain('unjust-judge');
     expect(text).toContain('Drive profiles');
     expect(text).toContain('Atmospheres');
     expect(text.split('\n').length).toBeGreaterThan(200);
+  });
+
+  /**
+   * Running the suite used to rewrite docs/archetypes.md as a side effect. It
+   * did keep the sheets from drifting, and it also meant `npm test` left the
+   * working tree dirty — a test that edits the repository is not really a test,
+   * and it quietly hides the drift it exists to catch: the file is fixed before
+   * anyone is told it was wrong.
+   *
+   * So the default is to check, and only `npm run docs` writes. Both paths run
+   * the same generator, so the check cannot pass against a stale writer.
+   */
+  it('matches the sheets that are committed', () => {
+    const path = join(__dirname, '..', '..', 'docs', 'archetypes.md');
+    const generated = document();
+
+    if (process.env['npm_lifecycle_event'] === 'docs') {
+      writeFileSync(path, generated, 'utf8');
+      return;
+    }
+
+    const committed = readFileSync(path, 'utf8').replace(/\r\n/g, '\n');
+    expect(
+      committed === generated.replace(/\r\n/g, '\n'),
+      'docs/archetypes.md is out of date with the library. Run: npm run docs',
+    ).toBe(true);
   });
 });

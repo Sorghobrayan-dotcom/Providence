@@ -223,7 +223,7 @@ TypeScript and re-read: it has to be written again. See `godot/README.md`.
 npm test
 ```
 
-450 of them. The ones worth reading first are in
+476 of them. The ones worth reading first are in
 `src/__tests__/providenceIntegrity.test.ts`, which assert the claims this project
 makes about itself, and `providenceEndToEnd.test.ts`, which runs one story
 through every part of the engine at once and calls the real platform.
