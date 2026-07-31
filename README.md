@@ -188,11 +188,18 @@ standing in front of him. `src/providence/portraits.ts` supplies the other half 
 his register, his wound, what he wants, and the things he will not do whatever
 the player tries — and every line of it carries the passage it is read from. Ask
 the fugitive and the judge the same question and they no longer answer in the
-same voice. Sixteen of the twenty four are still without a portrait; they are
-listed by hand, and the suite fails if an arc is neither written nor listed.
+same voice. All twenty four carry one, and the list of those that do not is kept
+by hand rather than derived, so a twenty fifth arc fails the suite until somebody
+decides whether it has a voice.
 
-He is forbidden to quote or paraphrase Scripture, and when no line comes back he
-says nothing at all.
+He is forbidden to quote or paraphrase Scripture, and the answer is checked
+rather than trusted: six consecutive words in common with the passage is a
+quotation, and a line that recites is refused. When no line comes back he says
+nothing at all.
+
+Only Scripture is cited. A character's own words appear without a reference
+under them, because a paraphrase set beside a reference reads as the verse — the
+console keeps the reference, on the channel that is labelled as telemetry.
 
 Gloo advises, Providence decides. When a developer declares an action the engine
 does not recognise, `Interpreter.ts` tries its own rules first, asks the model
