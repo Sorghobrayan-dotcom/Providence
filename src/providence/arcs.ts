@@ -27,6 +27,17 @@ export const JONAH: Arc = {
           note: 'il se leve pour fuir loin de sa mission',
         },
         {
+          /* Being reached is itself the trigger. He is not refusing a request
+             here - nobody has made one - he is getting up and going the other
+             way because someone who wants something has arrived. Weak pull, so
+             that an actual appeal still wins over simple proximity. */
+          to: 'fleeing',
+          when: (c) => c.world.distanceToPlayer < 3.5 && c.world.errand !== null,
+          appeal: () => 0.3,
+          because: 'JON.1.3',
+          note: 'il se leva pour fuir a Tarsis loin de la face de l Eternel',
+        },
+        {
           to: 'obeying',
           when: (c) => c.disposition.resolve >= 0.6,
           because: 'JON.3.3',
@@ -294,6 +305,39 @@ export const RUTH: Arc = {
           when: (c) => c.world.kindnessesWitnessed >= 2 && !c.memory.harmedMyHouse,
           because: 'RUT.1.16',
           note: 'ou tu iras j irai',
+        },
+        {
+          /* The other door into the same room. kindnessesWitnessed only counts
+             what she happened to be standing there for, so a player with a whole
+             public record behind him could wait in front of her forever and
+             never move her. She is the one who chooses; the record is what she
+             reads to choose by. */
+          to: 'binding',
+          when: (c) => c.covenant.standing === 'just' && !c.memory.harmedMyHouse,
+          because: 'RUT.2.12',
+          note: 'que l Eternel te recompense pour ce que tu as fait',
+        },
+        {
+          to: 'withdrawing',
+          when: (c) => c.covenant.standing === 'transgressor' || c.memory.harmedMyHouse === true,
+          because: 'RUT.1.15',
+          note: 'ta belle soeur est retournee vers son peuple',
+        },
+      ],
+    },
+    {
+      /* Not hostile, and not a door shut for good: she returns to watching if
+         the record changes. Choosing is her verb, and a choice that could never
+         have gone the other way is not one. */
+      id: 'withdrawing',
+      directive: { move: 'away-from-player', posture: 'apart' },
+      drift: { trust: -0.04 },
+      transitions: [
+        {
+          to: 'watching',
+          when: (c) => c.covenant.standing !== 'transgressor' && !c.memory.harmedMyHouse,
+          because: 'RUT.2.11',
+          note: 'on lui a rapporte tout ce que tu as fait',
         },
       ],
     },

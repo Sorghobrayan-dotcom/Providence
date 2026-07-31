@@ -104,7 +104,11 @@ describe('Ruth cannot be bought by kindness aimed at her', () => {
 
     const ruth = new Actor(RUTH, memoryFor(graph, 'ruth'));
     run(ruth, 60, { distanceToPlayer: 2, kindnessesWitnessed: 8 });
-    expect(ruth.state).toBe('watching'); // she watched, and she is not moving
+    /* She now refuses by withdrawing rather than by standing still. The claim
+       is unchanged and is asserted directly: whatever she does, she does not
+       bind herself to a man who harmed her house. */
+    expect(ruth.state).toBe('withdrawing');
+    expect(ruth.state).not.toBe('binding');
   });
 });
 
@@ -179,6 +183,7 @@ describe('memory is read live, not captured once', () => {
     // the betrayal happens now, while she is already watching him
     graph.commit({ kind: 'betray', actor: 'player', toward: 'her-kinsman' });
     run(ruth, 40, { distanceToPlayer: 2, kindnessesWitnessed: 6 });
-    expect(ruth.state).toBe('watching');
+    expect(ruth.state).toBe('withdrawing');
+    expect(ruth.state).not.toBe('binding');
   });
 });

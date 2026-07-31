@@ -25,7 +25,7 @@ Starting disposition: trust 0.5, fear 0.3, resolve 0.25.
 
 | state | intends | drifts | goes to |
 | --- | --- | --- | --- |
-| `commissioned` | hold · burdened | — | `fleeing` (JON.1.3)<br>`obeying` (JON.3.3)<br>`shrinking` (JON.4.2)<br>`confiding` (JON.1.12) |
+| `commissioned` | hold · burdened | — | `fleeing` (JON.1.3)<br>`fleeing` (JON.1.3)<br>`obeying` (JON.3.3)<br>`shrinking` (JON.4.2)<br>`confiding` (JON.1.12) |
 | `shrinking` | away-from-player · averting · refusing | fear +0.04/s, trust -0.03/s | `fleeing` (JON.1.3)<br>`commissioned` (JON.4.5) |
 | `confiding` | toward-player · confiding | trust +0.05/s, fear -0.04/s | `commissioned` (JON.4.2) |
 | `fleeing` | away-from-errand · fleeing · refusing | fear +0.05/s | `caught` (JON.1.4) |
@@ -65,7 +65,8 @@ Starting disposition: trust 0.2, fear 0.2, resolve 0.5.
 | state | intends | drifts | goes to |
 | --- | --- | --- | --- |
 | `stranger` | hold · apart | — | `watching` (RUT.2.11) |
-| `watching` | hold · observing | — | `binding` (RUT.1.16) |
+| `watching` | hold · observing | — | `binding` (RUT.1.16)<br>`binding` (RUT.2.12)<br>`withdrawing` (RUT.1.15) |
+| `withdrawing` | away-from-player · apart | trust -0.04/s | `watching` (RUT.2.11) |
 | `binding` | toward-player · binding · companion | trust +0.1/s | `steadfast` (RUT.1.17) |
 | `steadfast` | toward-player · steadfast · companion | — | *end* |
 
