@@ -9,13 +9,13 @@ than a day.
 
 | | |
 | --- | --- |
-| engine | 3,460 lines across 15 modules |
-| tests | 2,562 lines, 167 assertions in 18 files |
-| editor | 982 lines |
+| engine | 4,841 lines across 20 modules |
+| tests | 4,476 lines, 362 assertions in 27 files |
+| editor | 2,155 lines, 58 assertions in 3 files |
 | notebook | 47 cells, 25 of them executable, all passing |
 | bundle | 59 kB for the editor, 482 kB for Three.js |
 
-The test-to-engine ratio is roughly 3 to 4, which is the right shape for a
+The test-to-engine ratio is roughly 1 to 1, which is the right shape for a
 project whose entire argument is that its claims are checked rather than asserted.
 
 ## What holds up
@@ -26,7 +26,7 @@ ten thousand episodes, two populations differing only in merit land within 0.03,
 and a test reads the engine source files to confirm no verse text has crept in.
 Any of these breaking makes the writeup untrue, and that is the point of them.
 
-**Scripture is load-bearing rather than decorative.** Nothing in 3,460 lines
+**Scripture is load-bearing rather than decorative.** Nothing in 4,841 lines
 stores a verse. Remove the key and the characters go silent, which is asserted
 directly. The proxy means the credential never reaches the browser, and a test
 fails if a `VITE_*KEY` reappears in client code.
@@ -43,11 +43,11 @@ and two in the proxy. None of them were visible on the page.
 
 ## What does not hold up
 
-**The editor has no tests at all.** 982 lines, zero coverage. It is the thing a
-judge will look at first and the only part of the project with no safety net. The
-excuse is that it is a view and views are awkward to test; the honest answer is
-that the panels contain real logic, the graph layout in particular, and none of it
-is checked.
+**Half the editor still has no tests.** This was the worst thing on the list and
+it is now half fixed: `Bearing`, `Speech`, the console and the logo carry 58
+assertions between them. `panels.ts`, `main.ts` and `Stage3D.ts` — 1,204 of the
+2,155 lines — remain uncovered, and the graph layout in the panels is real logic
+sitting behind no net at all.
 
 **Godot ships 4 arcs, not 24.** A transition holds a predicate, and a predicate
 is code rather than data, so it cannot be exported from the TypeScript and
@@ -80,8 +80,8 @@ test, and `npm test` should not leave the repository dirty.
 ## Proposals, ranked by value for the effort
 
 **1. Test the editor panels.** Extract the graph layout and the deed handling from
-the DOM and cover them. Perhaps 150 lines of test for the one part of the project
-that currently has none. Highest value per hour of anything on this list.
+the DOM and cover them, the way `Bearing` and the console already are. The last
+1,204 lines with no net, and still the highest value per hour on this list.
 
 **2. Open Godot once and run the addon.** An hour, and it converts a plausible
 claim into a true one. Until that happens the honest phrasing in the writeup is

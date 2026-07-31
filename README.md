@@ -14,7 +14,8 @@ npm install
 npm run dev
 ```
 
-Then open <http://localhost:5174/providence.html>.
+Then open the address Vite prints. The editor is the front door; `nuit-du-baton.html`
+is the older prototype described at the bottom of this file.
 
 ---
 
@@ -178,7 +179,7 @@ TypeScript and re-read: it has to be written again. See `godot/README.md`.
 npm test
 ```
 
-157 of them. The ones worth reading first are in
+362 of them. The ones worth reading first are in
 `src/__tests__/providenceIntegrity.test.ts`, which assert the claims this project
 makes about itself, and `providenceEndToEnd.test.ts`, which runs one story
 through every part of the engine at once and calls the real platform.
@@ -205,6 +206,7 @@ ally, however many lines you give it.
 | [docs/deploying.md](docs/deploying.md) | the Scripture proxy and what it refuses |
 | [docs/review.md](docs/review.md) | an honest audit, including what does not hold up |
 | [docs/writeup.md](docs/writeup.md) | the submission writeup |
+| [docs/cover.html](docs/cover.html) | the cover image, and the page it renders from |
 
 [docs/review.md](docs/review.md) is worth reading before the code. It lists the
 weaknesses as plainly as the strengths: the editor has no tests, the Godot addon
@@ -225,7 +227,8 @@ Press Run All and every claim prints its own proof, with the numbers matching
 this test suite.
 
 It makes one live call to the YouVersion Platform API. On Kaggle, add the App Key
-as a secret named `YOUVERSION_APP_KEY`; locally it also reads `.env`. Without a
+as a secret named `YOUVERSION_APP_KEY`; locally it reads the environment variable
+of the same name. Without a
 key the notebook says so and shows the silence rather than pretending.
 
 ```

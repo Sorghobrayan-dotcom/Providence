@@ -1,0 +1,176 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Providence — cover</title>
+<style>
+  :root {
+    --ink: #07070a;
+    --gold: #c9a227;
+    --gold-dim: #6b5518;
+    --bone: #ece6da;
+    --ash: #8a8378;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1600px; height: 900px; }
+  body {
+    background: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    color: var(--bone);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* the light coming through, from the upper left */
+  .glow {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(1100px 780px at 18% -10%, rgba(201,162,39,.20), transparent 62%),
+      radial-gradient(800px 600px at 78% 108%, rgba(201,162,39,.07), transparent 60%);
+  }
+  .frame {
+    position: absolute; inset: 34px;
+    border: 1px solid rgba(201,162,39,.30);
+  }
+  .frame::after {
+    content: ''; position: absolute; inset: 9px;
+    border: 1px solid rgba(201,162,39,.12);
+  }
+
+  .sheet {
+    position: absolute; inset: 34px;
+    display: grid;
+    grid-template-columns: 1fr 600px;
+    align-items: center;
+    padding: 62px 74px;
+  }
+
+  .eyebrow {
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 15px; letter-spacing: .34em; text-transform: uppercase;
+    color: var(--gold); opacity: .82;
+  }
+
+  h1 {
+    font-size: 106px; line-height: .92; font-weight: normal;
+    letter-spacing: .045em; margin: 30px 0 0;
+    color: #fbf6ea;
+    text-shadow: 0 0 46px rgba(201,162,39,.28);
+  }
+
+  .rule {
+    width: 132px; height: 1px; margin: 30px 0 26px;
+    background: linear-gradient(90deg, var(--gold), rgba(201,162,39,0));
+  }
+
+  h2 {
+    font-size: 31px; font-weight: normal; font-style: italic;
+    color: var(--bone); letter-spacing: .012em;
+  }
+
+  .line {
+    margin-top: 26px; max-width: 620px;
+    font-size: 21px; line-height: 1.55; color: var(--ash);
+  }
+  .line b { color: var(--bone); font-weight: normal; }
+
+  .stats {
+    position: absolute; left: 74px; bottom: 62px;
+    display: flex; gap: 34px; align-items: baseline;
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 15px; letter-spacing: .17em; text-transform: uppercase;
+    color: var(--ash);
+  }
+  .stats b { color: var(--gold); font-weight: normal; }
+  .stats span { white-space: nowrap; }
+  .dot { color: rgba(201,162,39,.4); }
+
+  /* the graph: what moves between souls, with one tie broken */
+  .graph { justify-self: end; align-self: center; margin-right: 8px; }
+  .glabel {
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 13px; fill: var(--ash); letter-spacing: .1em;
+  }
+  .gref {
+    font-family: Consolas, 'Courier New', monospace;
+    font-size: 12px; fill: rgba(201,162,39,.55); letter-spacing: .08em;
+  }
+  .gname {
+    font-family: Georgia, serif; font-size: 16px; fill: #ded7c9;
+  }
+</style>
+
+<div class="glow"></div>
+<div class="frame"></div>
+
+<div class="sheet">
+  <div>
+    <div class="eyebrow">YouVersion &nbsp;&times;&nbsp; Gloo &nbsp;&middot;&nbsp; Scripture in New Frontiers</div>
+    <h1>PROVIDENCE</h1>
+    <div class="rule"></div>
+    <h2>A moral physics layer for game engines.</h2>
+    <p class="line">
+      Your engine already knows where the body falls.<br>
+      <b>It has no idea what that costs.</b>
+    </p>
+  </div>
+
+  <svg class="graph" width="600" height="620" viewBox="0 0 600 620" fill="none">
+    <defs>
+      <radialGradient id="node" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#f6ecd2"/>
+        <stop offset="100%" stop-color="#c9a227"/>
+      </radialGradient>
+      <linearGradient id="snap" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#c9a227" stop-opacity=".9"/>
+        <stop offset="100%" stop-color="#c9a227" stop-opacity=".05"/>
+      </linearGradient>
+    </defs>
+
+    <!-- intact bonds -->
+    <g stroke="rgba(201,162,39,.34)" stroke-width="1">
+      <path d="M280 100 L120 262"/>
+      <path d="M280 100 L430 256"/>
+      <path d="M120 262 L196 462"/>
+      <path d="M430 256 L196 462"/>
+      <path d="M430 256 L410 478"/>
+      <path d="M196 462 L410 478"/>
+    </g>
+
+    <!-- the broken one: snapped, and it does not grow back -->
+    <path d="M280 100 L256 205" stroke="url(#snap)" stroke-width="2.4"/>
+    <path d="M238 290 L196 462" stroke="rgba(201,162,39,.15)" stroke-width="2.4" stroke-dasharray="5 9"/>
+
+    <!-- nodes -->
+    <g>
+      <circle cx="280" cy="100" r="7.5" fill="url(#node)"/>
+      <circle cx="120" cy="262" r="5" fill="#c9a227" fill-opacity=".75"/>
+      <circle cx="430" cy="256" r="5" fill="#c9a227" fill-opacity=".75"/>
+      <circle cx="196" cy="462" r="5" fill="#c9a227" fill-opacity=".75"/>
+      <circle cx="410" cy="478" r="5" fill="#c9a227" fill-opacity=".75"/>
+      <circle cx="280" cy="100" r="17" stroke="rgba(201,162,39,.35)" stroke-width="1"/>
+    </g>
+
+    <text class="gname" x="280" y="74" text-anchor="middle">the player</text>
+    <text class="gname" x="100" y="258" text-anchor="end">kin</text>
+    <text class="gname" x="452" y="250">household</text>
+    <text class="gname" x="196" y="492" text-anchor="middle">stranger</text>
+    <text class="gname" x="410" y="508" text-anchor="middle">covenant</text>
+
+    <text class="glabel" x="296" y="188">betrayal &nbsp;&middot;&nbsp; weight &times;5</text>
+    <text class="gref"   x="296" y="210">GEN.27.35</text>
+    <text class="glabel" x="246" y="392" fill="rgba(138,131,120,.72)">the tie does not grow back</text>
+
+    <text class="gref" x="58" y="330">LUK.22.57</text>
+    <text class="gref" x="446" y="318">RUT.1.16</text>
+
+    <text class="glabel" x="290" y="578" text-anchor="middle" fill="rgba(138,131,120,.85)">
+      the engine holds references. never the text.
+    </text>
+  </svg>
+</div>
+
+<div class="stats">
+  <span><b>24</b> archetypes</span><span class="dot">&middot;</span>
+  <span><b>362</b> tests</span><span class="dot">&middot;</span>
+  <span><b>10,000</b>-soul graph</span><span class="dot">&middot;</span>
+  <span><b>0</b> verses stored</span>
+</div>

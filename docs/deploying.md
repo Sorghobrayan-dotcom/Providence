@@ -38,7 +38,8 @@ npm run build
 
 Then in the site settings add an environment variable `YOUVERSION_APP_KEY`, and
 `GLOO_API_KEY` if you have one. `netlify.toml` already sets the build command,
-the publish directory, and a redirect from `/` to `/providence.html`.
+and the publish directory. The editor is `index.html`, so the front door is
+already at the root and there is no redirect to get wrong.
 
 ## Vercel
 

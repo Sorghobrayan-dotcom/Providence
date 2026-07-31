@@ -5,9 +5,6 @@
   command = "npm run build"
   publish = "dist"
 
-# providence.html is the product. index.html is the earlier boss-fight prototype,
-# kept because the editor reuses its renderer.
-[[redirects]]
-  from = "/"
-  to = "/providence.html"
-  status = 302
+# index.html is the editor, and it is the product. nuit-du-baton.html is the
+# earlier boss-fight prototype, kept because the editor reuses its renderer.
+# No redirect: the front door is already at the root.
