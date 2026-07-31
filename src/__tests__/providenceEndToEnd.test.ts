@@ -39,7 +39,7 @@ describe('end to end: one story through the whole engine', () => {
 
     /* --- 1. a soul, under pressure --- */
     const peter = new Actor(PETER);
-    const world = { ...blankWorld(), distanceToPlayer: 2, underThreat: true };
+    const world = { ...blankWorld(), distanceToPlayer: 2, underThreat: true, requestsMade: 1 };
     let denial: string | null = null;
     for (let t = 0; t < 60 && !denial; t++) {
       const event = peter.update(1, world);

@@ -60,7 +60,7 @@ describe('the same room reaches a character built on nothing but booleans', () =
     const peter = new Actor(PETER);
     peter.standsIn(place);
     for (let t = 0; t < 200; t++) {
-      peter.update(1, quiet({ underThreat: true }));
+      peter.update(1, quiet({ underThreat: true, requestsMade: 1 }));
       if (peter.state === 'denying') return t;
     }
     return -1;

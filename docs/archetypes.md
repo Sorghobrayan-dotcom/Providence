@@ -40,12 +40,13 @@ Ends in `sulking`.
 
 *Loyalty bars that only ever go up or down. This one snaps, then mends higher than before.*
 
-Drawn from LUK.22.33. Opens in `following`.
+Drawn from LUK.22.33. Opens in `willing`.
 
 Starting disposition: trust 0.85, fear 0.1, resolve 0.9.
 
 | state | intends | drifts | goes to |
 | --- | --- | --- | --- |
+| `willing` | hold · ready | — | `following` (LUK.22.33) |
 | `following` | toward-player · sworn · companion | — | `pressed` (LUK.22.54) |
 | `pressed` | hold · wary · companion | fear +0.09/s, trust -0.02/s | `denying` (LUK.22.57)<br>`following` (LUK.22.33) |
 | `denying` | away-from-player · denying · refusing | trust -0.12/s | `weeping` (LUK.22.62) |

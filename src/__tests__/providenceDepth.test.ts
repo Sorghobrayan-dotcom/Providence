@@ -14,6 +14,10 @@ import type { WorldView } from '../providence/types';
 
 const world = (over: Partial<Omit<WorldView, 'timeInNode'>> = {}): Omit<WorldView, 'timeInNode'> => ({
   ...blankWorld(),
+  /* Asked, and he came. Peter waits in 'willing' now, so a test about him
+     breaking has to get him following first: you cannot break a promise
+     nobody asked him to make. */
+  requestsMade: 1,
   distanceToPlayer: 4,
   ...over,
 });

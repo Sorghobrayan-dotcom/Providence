@@ -157,9 +157,26 @@ export const PETER: Arc = {
   label: 'Le Serment Brise',
   solves: 'Loyalty bars that only ever go up or down. This one snaps, then mends higher than before.',
   source: 'LUK.22.33',
-  initial: 'following',
+  initial: 'willing',
   start: { trust: 0.85, fear: 0.1, resolve: 0.9 },
   nodes: [
+    {
+      /* He is not your companion until you ask him to be. Starting him in
+         'following' meant he attached himself in the first frame, which reads
+         as a fixture rather than as a man who said yes — and it threw away the
+         one moment the whole arc is measured against, since a promise nobody
+         asked for cannot be broken later. */
+      id: 'willing',
+      directive: { move: 'hold', posture: 'ready' },
+      transitions: [
+        {
+          to: 'following',
+          when: (c) => c.world.requestsMade > 0,
+          because: 'LUK.22.33',
+          note: 'seigneur, je suis pret a aller avec toi et a la prison et a la mort',
+        },
+      ],
+    },
     {
       id: 'following',
       directive: { move: 'toward-player', posture: 'sworn', companion: true },

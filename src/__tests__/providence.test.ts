@@ -5,6 +5,10 @@ import type { WorldView } from '../providence/types';
 
 const world = (over: Partial<Omit<WorldView, 'timeInNode'>> = {}): Omit<WorldView, 'timeInNode'> => ({
   ...blankWorld(),
+  /* Asked, and he came. Peter waits in 'willing' now, so a test about him
+     breaking has to get him following first: you cannot break a promise
+     nobody asked him to make. */
+  requestsMade: 1,
   distanceToPlayer: 20,
   ...over,
 });
@@ -62,6 +66,7 @@ describe('Peter — loyalty that breaks and can be repaired', () => {
 
   it('returns to your side if the danger passes before he breaks', () => {
     const peter = new Actor(PETER);
+    peter.update(1, world({}));                       // asked, and he comes
     peter.update(1, world({ underThreat: true }));
     expect(peter.state).toBe('pressed');
     runUntil(peter, 'following', { underThreat: false });
@@ -125,8 +130,13 @@ describe('library invariants', () => {
 
   it('fires at most one transition per tick, so a change of heart is never skipped over', () => {
     const peter = new Actor(PETER);
+    /* Threatened from the very first tick, with two transitions available to
+       him in sequence. He takes the first and stops: saying yes and being
+       frightened of it are two separate moments, and collapsing them would
+       skip the one the arc is measured against. */
     const event = peter.update(1, world({ underThreat: true }));
-    expect(event?.to).toBe('pressed');
+    expect(event?.to).toBe('following');
+    expect(peter.state).toBe('following');
     expect(peter.journal).toHaveLength(1);
   });
 });
