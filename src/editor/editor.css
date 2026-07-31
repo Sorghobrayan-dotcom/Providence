@@ -268,6 +268,37 @@ canvas { display: block; width: 100%; height: 100%; }
 }
 .choice:hover { background: var(--raised); }
 
+/* The visit. A card in the corner and an outline on whatever it is talking
+   about — no dimming veil over the rest, because the point is to look at the
+   instrument while it is explained, not at a hole cut in a curtain. */
+.tour-open { font-size: 12px; padding: 4px 9px; flex: 0 0 auto; }
+
+.tour {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 40;
+  width: 320px;
+  padding: 14px 16px 12px;
+  background: var(--panel);
+  border: 1px solid var(--edge-bright);
+}
+.tour[hidden] { display: none; }
+.tour-where {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+.tour-title { margin: 6px 0 0; font-size: 14px; font-weight: 500; color: var(--ink); }
+.tour-says { margin: 7px 0 12px; font-size: 12px; line-height: 1.55; color: var(--ink-3); }
+.tour-feet { display: flex; gap: 4px; justify-content: flex-end; }
+
+/* What the current step is about. Inset, so it never shifts the layout it is
+   drawing attention to. */
+.toured { outline: 2px solid var(--ink); outline-offset: -2px; }
+
 /* A key cap, in the toolbar and in the cue, so the two read as the same thing. */
 kbd {
   font-family: var(--mono);

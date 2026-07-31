@@ -133,6 +133,11 @@ indistinguishable from an empty world.
 The conversation does not survive the character changing state. If Jonah decides
 to run while the menu is open, the menu closes.
 
+A first visit is offered two minutes on the instrument itself — seven steps, each
+marking the zone it is about — and the `?` in the toolbar replays it. A test
+reads the editor's source and fails if a step names a zone that has been
+renamed, because a tour highlighting nothing fails silently.
+
 The line under the figure says what he is doing in plain words and what to press
 next. It is written per node in `src/editor/Cues.ts`, a cue may only name a
 control that exists, and a test enforces that — see
@@ -218,7 +223,7 @@ TypeScript and re-read: it has to be written again. See `godot/README.md`.
 npm test
 ```
 
-438 of them. The ones worth reading first are in
+450 of them. The ones worth reading first are in
 `src/__tests__/providenceIntegrity.test.ts`, which assert the claims this project
 makes about itself, and `providenceEndToEnd.test.ts`, which runs one story
 through every part of the engine at once and calls the real platform.

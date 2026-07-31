@@ -10,8 +10,8 @@ than a day.
 | | |
 | --- | --- |
 | engine | 5,228 lines across 21 modules |
-| tests | 5,393 lines, 438 assertions in 32 files |
-| editor | 3,215 lines, 108 assertions in 7 files |
+| tests | 5,514 lines, 450 assertions in 33 files |
+| editor | 3,436 lines, 120 assertions in 8 files |
 | notebook | 47 cells, 25 of them executable, all passing |
 | bundle | 59 kB for the editor, 482 kB for Three.js |
 
@@ -75,12 +75,21 @@ fugitive answers `Tu voulais quoi, toi, en fuyant ?` and the judge answers
 `Encore toi ? Le juge ne change pas d'avis parce qu'on frappe deux fois à sa
 porte`.
 
+**The instrument explains itself now.** The cue always said what the character
+was doing and nothing said what the room around him was: why two controls are
+keys and eleven are toggles, what the four tabs hold, what the console is a log
+of. All of that was written down in `docs/`, where nobody with five minutes finds
+it. Seven steps, offered once and replayable from the `?`. The thing that rots in
+a tour is the anchor — rename a zone and it goes on highlighting nothing — so the
+test reads the editor's own source and fails on a selector that is no longer in
+it.
+
 ## What does not hold up
 
 **`main.ts` and `Stage3D.ts` still have no tests.** This was the worst thing on
 the list and most of it is now closed: `Bearing`, `Speech`, the console, the
 logo, the cues, the relation panel, the encounter and the verbs carry 108
-assertions between them. What is left is the 1,330 lines of wiring in `main.ts`
+assertions between them. What is left is the 1,406 lines of wiring in `main.ts`
 and the viewport, and the wiring is where every remaining bug has been found —
 the boot path that set the first arc up by hand, the cast that left it out of
 the graph, the three from the conversation above, and the two counters that

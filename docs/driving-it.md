@@ -1,5 +1,8 @@
 # Driving it
 
+The editor offers a two minute visit the first time it is opened, and the `?` in
+the toolbar replays it whenever you like. This page is the longer version.
+
 Five minutes, six characters, no reading of the source required. The editor now
 tells you this as you go — the line under the figure says what he is doing and
 what to press — so this page is the same thing on paper, for anyone who wants it

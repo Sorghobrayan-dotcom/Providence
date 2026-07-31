@@ -20,6 +20,7 @@ import { METRES_PER_UNIT } from './Stage3D';
 import { memoryFor } from '../providence/memory';
 import { cueFor, plainly } from './Cues';
 import { Encounter, type EncounterState } from './Encounter';
+import { Tour, type Step } from './Tour';
 import { verbsFor, type Verb } from './Verbs';
 
 /**
@@ -77,7 +78,19 @@ root.innerHTML = `
       </div>
     </div>
     <div class="flags" id="flags"></div>
+    <button class="ghost tour-open" type="button" id="tour-open" title="Two minute visit">?</button>
     <div class="api-state" id="api-state">scripture: checking</div>
+  </div>
+
+  <div class="tour" id="tour" hidden>
+    <div class="tour-where" id="tour-where"></div>
+    <h2 class="tour-title" id="tour-title"></h2>
+    <p class="tour-says" id="tour-says"></p>
+    <div class="tour-feet">
+      <button class="ghost" type="button" id="tour-back">Back</button>
+      <button class="ghost" type="button" id="tour-next">Next</button>
+      <button class="ghost" type="button" id="tour-done">Close</button>
+    </div>
   </div>
 
   <aside class="dock library">
@@ -623,6 +636,64 @@ hailEl.addEventListener('click', () => {
   hailEl.blur();
 });
 
+/* ------------------------------------------------------------------ */
+/* The visit                                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Two minutes on the instrument itself.
+ *
+ * The cue explains the character and nothing explains the room around him: what
+ * the row of toggles is, why two of them are keys, what the four tabs hold. All
+ * of that is written down in `docs/`, where nobody with five minutes will find
+ * it. `Tour` holds the steps and the counter and is tested without a DOM; this
+ * marks the zone and moves the card.
+ */
+const tour = new Tour((() => {
+  try {
+    return typeof localStorage === 'undefined' ? null : localStorage;
+  } catch {
+    return null; // private browsing, and it simply gets offered again
+  }
+})());
+
+const tourEl = document.getElementById('tour') as HTMLElement;
+const tourTitleEl = document.getElementById('tour-title') as HTMLElement;
+const tourSaysEl = document.getElementById('tour-says') as HTMLElement;
+const tourWhereEl = document.getElementById('tour-where') as HTMLElement;
+const tourNextEl = document.getElementById('tour-next') as HTMLButtonElement;
+let marked: Element | null = null;
+
+function showTour(step: Step | null): void {
+  marked?.classList.remove('toured');
+  marked = null;
+
+  if (!step) {
+    tourEl.hidden = true;
+    return;
+  }
+
+  /* The affordance over his head only exists while somebody is within reach of
+     it, so its step marks nothing most of the time. Saying so beats outlining
+     a corner of an empty field. */
+  marked = document.querySelector(step.anchor);
+  marked?.classList.add('toured');
+
+  tourEl.hidden = false;
+  tourWhereEl.textContent = `${tour.position} of ${tour.length}`;
+  tourTitleEl.textContent = step.title;
+  tourSaysEl.textContent = step.says;
+  tourNextEl.textContent = tour.position === tour.length ? 'Done' : 'Next';
+}
+
+document.getElementById('tour-open')?.addEventListener('click', () => showTour(tour.start()));
+tourNextEl.addEventListener('click', () => showTour(tour.next()));
+document.getElementById('tour-back')?.addEventListener('click', () => showTour(tour.back()));
+document.getElementById('tour-done')?.addEventListener('click', () => {
+  tour.stop();
+  showTour(null);
+});
+
 function renderInspector(): void {
   if (panel === 'relations') {
     if (inspectorEl.firstChild !== relations.root) inspectorEl.replaceChildren(relations.root);
@@ -887,4 +958,9 @@ relations.reports((summary, because) => {
    here is how the first arc ended up being the one arc with no memory. */
 selectArc(arc);
 note('providence editor ready', 'GEN.1.1');
+
+/* Once, on a first visit. Asked every load it becomes a banner, and a thing you
+   dismiss without reading teaches the reflex of dismissing. */
+if (tour.worthOffering) showTour(tour.start());
+
 requestAnimationFrame(frame);
