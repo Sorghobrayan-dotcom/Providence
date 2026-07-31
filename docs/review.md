@@ -9,9 +9,9 @@ than a day.
 
 | | |
 | --- | --- |
-| engine | 4,841 lines across 20 modules |
-| tests | 4,656 lines, 377 assertions in 29 files |
-| editor | 2,540 lines, 73 assertions in 5 files |
+| engine | 4,889 lines across 20 modules |
+| tests | 5,084 lines, 416 assertions in 31 files |
+| editor | 3,162 lines, 108 assertions in 7 files |
 | notebook | 47 cells, 25 of them executable, all passing |
 | bundle | 59 kB for the editor, 482 kB for Three.js |
 
@@ -41,14 +41,27 @@ player who hurt her household however kind he is to her.
 Peter's terminal state, the self-reached bug, the fixed distance in the simulator,
 and two in the proxy. None of them were visible on the page.
 
+**A gesture that moves nothing now gets an answer.** A character spoke if and
+only if his arc had just changed, so asking Ruth for help — which her arc reads
+nothing into, deliberately — produced silence, and silence is indistinguishable
+from an empty world though what happened was a refusal. There is a conversation
+now: an offer to speak pinned over whoever you are standing next to, five
+gestures aimed at that person, and a line back either way. Three more things were
+found by driving it rather than by reading it: the menu's class collided with the
+toolbar's and stretched it, the approach threshold sat above the distance a newly
+loaded character spawns at so every click down the library bought a generated
+line, and the menu was wide enough to cover the person it was about.
+
 ## What does not hold up
 
 **`main.ts` and `Stage3D.ts` still have no tests.** This was the worst thing on
 the list and most of it is now closed: `Bearing`, `Speech`, the console, the
-logo, the cues and the relation panel carry 73 assertions between them. What is
-left is the 979 lines of wiring in `main.ts` and the viewport, and the wiring is
-where the last two real bugs were found — the boot path that set the first arc
-up by hand, and the cast that left it out of the graph.
+logo, the cues, the relation panel, the encounter and the verbs carry 108
+assertions between them. What is left is the 1,285 lines of wiring in `main.ts`
+and the viewport, and the wiring is where every remaining bug has been found —
+the boot path that set the first arc up by hand, the cast that left it out of
+the graph, and the three from the conversation above. It is now the largest
+untested file in the repository by some distance, and it grew again this week.
 
 **Godot ships 4 arcs, not 24.** A transition holds a predicate, and a predicate
 is code rather than data, so it cannot be exported from the TypeScript and

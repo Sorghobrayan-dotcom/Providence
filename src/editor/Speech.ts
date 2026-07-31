@@ -35,6 +35,10 @@ const FACE = `'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif`;
 /** Quoted Scripture is set in italic; the character's own words are not. */
 const SERIF = `italic ${BODY_SIZE}px ${FACE}`;
 const SPOKEN = `${BODY_SIZE}px ${FACE}`;
+/* Narration is neither. The editor's own rule is that serif is Scripture and
+   nothing else is ever set in it, so a description of what a man is doing is
+   set in the same sans the rest of the instrument uses. */
+const TOLD = `italic ${BODY_SIZE - 5}px ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif`;
 const MONO = `${CITE_SIZE}px ui-monospace, 'Cascadia Mono', Consolas, monospace`;
 
 /**
@@ -47,8 +51,13 @@ const MONO = `${CITE_SIZE}px ui-monospace, 'Cascadia Mono', Consolas, monospace`
  * `scripture` is the passage itself, shown while there is nothing to generate
  * from. It is set italic, so it reads as the citation it is and never pretends
  * to be dialogue.
+ *
+ * `narration` is the last resort: nothing was generated and there is no passage
+ * to fall back on, and the honest thing left to say is what he is visibly doing.
+ * It is set in sans and given no tail, because a tail means somebody said this
+ * and nobody did. Inventing him a line here is the one thing forbidden outright.
  */
-export type Voicing = 'utterance' | 'scripture';
+export type Voicing = 'utterance' | 'scripture' | 'narration';
 
 const FADE_IN = 0.22;
 const FADE_OUT = 0.55;
@@ -166,7 +175,10 @@ export class Speech {
 
   private draw(text: string, reference: string, voicing: Voicing): void {
     const ctx = this.ctx;
-    const face = voicing === 'utterance' ? SPOKEN : SERIF;
+    const face =
+      voicing === 'utterance' ? SPOKEN
+      : voicing === 'narration' ? TOLD
+      : SERIF;
     ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
     const lines = this.wrap(text, face);
@@ -191,17 +203,20 @@ export class Speech {
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // a tail, so it is unmistakably this character speaking and not a caption
-    ctx.beginPath();
-    ctx.moveTo(WIDTH / 2 - 13, bottom - 1);
-    ctx.lineTo(WIDTH / 2, bottom + tail);
-    ctx.lineTo(WIDTH / 2 + 13, bottom - 1);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(6, 6, 8, 0.82)';
-    ctx.fill();
+    /* A tail, so it is unmistakably this character speaking and not a caption.
+       Narration gets none, which is the whole distinction: it IS a caption. */
+    if (voicing !== 'narration') {
+      ctx.beginPath();
+      ctx.moveTo(WIDTH / 2 - 13, bottom - 1);
+      ctx.lineTo(WIDTH / 2, bottom + tail);
+      ctx.lineTo(WIDTH / 2 + 13, bottom - 1);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(6, 6, 8, 0.82)';
+      ctx.fill();
+    }
 
     ctx.font = face;
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = voicing === 'narration' ? 'rgba(255, 255, 255, 0.66)' : '#ffffff';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
     lines.forEach((line, i) => {

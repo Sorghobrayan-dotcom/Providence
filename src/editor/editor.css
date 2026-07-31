@@ -220,6 +220,54 @@ canvas { display: block; width: 100%; height: 100%; }
   border-bottom: 1px solid var(--edge-bright);
 }
 
+/* The offer to speak to him.
+
+   It is pinned over his head rather than added to the toolbar, because it is
+   the one control that exists on account of where you are standing. A control
+   that appears in a fixed row reads as always available; this one has to read
+   as being about him. */
+.hail {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 5px 9px;
+  color: var(--ink);
+  background: rgba(6, 6, 8, 0.82);
+  border-color: var(--edge-bright);
+  white-space: nowrap;
+  pointer-events: auto;
+}
+.hail[hidden] { display: none; }
+
+/* The menu takes the cue bar's place, because it answers the cue's question —
+   what can I do about this man — with the list rather than with a sentence. */
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  /* Kept narrow deliberately. The camera frames the two bodies at the middle of
+     the viewport, so a menu wide enough to look comfortable is a menu sitting
+     on top of the person you are talking to. */
+  width: max-content;
+  max-width: 42ch;
+  pointer-events: auto;
+}
+.menu[hidden] { display: none; }
+/* `.choice` and not `.verb`: the toolbar's two keys are already `.flag.verb`,
+   and sharing the name put a width:100% on them and stretched the toolbar. */
+.choice {
+  width: 100%;
+  text-align: left;
+  font-size: 12.5px;
+  padding: 7px 11px;
+  background: rgba(6, 6, 8, 0.72);
+}
+.choice:hover { background: var(--raised); }
+
 /* A key cap, in the toolbar and in the cue, so the two read as the same thing. */
 kbd {
   font-family: var(--mono);

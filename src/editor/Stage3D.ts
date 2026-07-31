@@ -66,6 +66,8 @@ export class Stage3D {
   private elapsed = 0;
   private isShadow = false;
   private readonly camTarget = new THREE.Vector3();
+  /** Scratch for projecting a world point to the canvas, reused every frame. */
+  private readonly probe = new THREE.Vector3();
 
   /* The colours the actor was dressed in, kept so the countenance can drain
      towards ash and come back. Reading them off the live material instead would
@@ -245,6 +247,18 @@ export class Stage3D {
    */
   say(text: string, reference: string, voicing: Voicing): void {
     this.speech.say(text, reference, voicing);
+  }
+
+  /**
+   * Where his head lands on the canvas, in 0..1, so the offer to speak to him
+   * can be pinned over the man it concerns rather than parked in a corner of
+   * the chrome. Presentation only: nothing reads this back into the library.
+   */
+  headAt(): { x: number; y: number } {
+    this.probe.set(0, 2.35, 0);
+    this.otherPivot.localToWorld(this.probe);
+    this.probe.project(this.camera);
+    return { x: (this.probe.x + 1) / 2, y: (1 - this.probe.y) / 2 };
   }
 
   /** Dress the actor for the arc that was just selected. */

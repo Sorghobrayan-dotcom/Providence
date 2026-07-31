@@ -10,6 +10,7 @@ before they open the tab.
 | | |
 | --- | --- |
 | **drag** in the viewport | moves *you*. Distance is an input to almost every arc. |
+| <kbd>E</kbd> | speak to whoever you are standing next to. Offered within three metres. |
 | <kbd>S</kbd> | ask him. The one thing you say. |
 | <kbd>K</kbd> | show a kindness, where he can see it. |
 | the eleven toggles | what the *world* is doing. You are not doing these; they are weather. |
@@ -17,9 +18,32 @@ before they open the tab.
 | **Place** | the room you are both standing in. |
 | **Grace** | the one thing you cannot cause. |
 
-Two of those are verbs and eleven are conditions, and the difference matters:
-asking and being kind are yours, and everything in the toolbar row is the
-situation you happen to be in.
+Three of those are verbs and eleven are conditions, and the difference matters:
+speaking, asking and being kind are yours, and everything in the toolbar row is
+the situation you happen to be in.
+
+## Speaking to somebody
+
+Walk within three metres and *Parler* <kbd>E</kbd> appears over their head. Press
+it and they open — their own words, generated from this arc, this node, how they
+are holding themselves and what you have done, and never a line written by us.
+Five gestures take the place of the cue at the foot of the screen, aimed at that
+particular person: ask, show a kindness, betray, bless, leave.
+
+Nothing is ever greyed out. Ask Ruth to come with you and the option is there,
+because the refusal is hers to make and disabling the button would move it to the
+interface. Her arc reads nothing into being asked, so nothing changes state — and
+she answers anyway, which is the thing that was missing. Before this, a gesture
+that moved nothing produced silence, and silence reads as an empty world rather
+than as a no.
+
+The world does not pause while the menu is open. If the character changes state
+mid-conversation the menu closes and the console says so: the soul does not wait
+for you to finish choosing.
+
+When Gloo cannot answer, they say nothing and a plain description of what they
+are doing appears instead, set apart from both speech and Scripture. An invented
+line is the one thing this refuses to do.
 
 ## Peter, in ninety seconds
 

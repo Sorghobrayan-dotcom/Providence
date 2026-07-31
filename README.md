@@ -117,6 +117,18 @@ see it. Asking is the whole of Peter's opening and the whole of the judge;
 kindness is the only road back from Peter's denial and the only thing that moves
 Ruth at all.
 
+Walk within three metres of anyone and an offer to speak appears over their
+head. Press <kbd>E</kbd> and they open — their own words, generated from the arc,
+the node and what you have done, never a written line — and five gestures aimed
+at that particular person take the place of the cue at the foot of the screen.
+The one that matters is the gesture that moves nothing: ask Ruth to come with
+you, which her arc reads nothing into on purpose, and she answers the refusal
+instead of standing there mute. A soul that says nothing when it declines is
+indistinguishable from an empty world.
+
+The conversation does not survive the character changing state. If Jonah decides
+to run while the menu is open, the menu closes.
+
 The line under the figure says what he is doing in plain words and what to press
 next. It is written per node in `src/editor/Cues.ts`, a cue may only name a
 control that exists, and a test enforces that — see
@@ -190,7 +202,7 @@ TypeScript and re-read: it has to be written again. See `godot/README.md`.
 npm test
 ```
 
-377 of them. The ones worth reading first are in
+416 of them. The ones worth reading first are in
 `src/__tests__/providenceIntegrity.test.ts`, which assert the claims this project
 makes about itself, and `providenceEndToEnd.test.ts`, which runs one story
 through every part of the engine at once and calls the real platform.
@@ -221,8 +233,9 @@ ally, however many lines you give it.
 | [docs/cover.html](docs/cover.html) | the cover image, and the page it renders from |
 
 [docs/review.md](docs/review.md) is worth reading before the code. It lists the
-weaknesses as plainly as the strengths: the editor has no tests, the Godot addon
-has never been run, and the viewport is 482 kB of Three.js on a first paint.
+weaknesses as plainly as the strengths: `main.ts` and the viewport are 1,285
+lines with no tests under them, the Godot addon has never been run, and the
+viewport is 482 kB of Three.js on a first paint.
 
 The sheets are generated from the library by `archetypeSheets.test.ts` rather than
 kept by hand. A table of 24 characters maintained manually drifts within a week,

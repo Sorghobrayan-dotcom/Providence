@@ -186,6 +186,44 @@ describe('the prompt', () => {
   });
 });
 
+/**
+ * The hole this closes.
+ *
+ * A character spoke only when his arc moved. Ask Jonah for help, have nothing
+ * in him give way, and the world said nothing back — which is indistinguishable
+ * from a world with nothing in it, though what actually happened was a refusal.
+ */
+describe('the three moments he can speak from', () => {
+  it('greets without claiming anything has changed in him', () => {
+    const { content } = promptFor(occasion({ moment: 'greeting' }))[1]!;
+    expect(content).toContain('vient de l\'aborder');
+    expect(content).not.toContain('Il vient de passer');
+    expect(content).toContain('Écris la première chose qu\'il dit');
+  });
+
+  it('answers a request that moved nothing, and says plainly that nothing moved', () => {
+    const { content } = promptFor(occasion({
+      moment: 'answered-request',
+      asked: 'On vient de lui demander de laisser là sa mission et de venir aider cette personne.',
+    }))[1]!;
+    expect(content).toContain('de laisser là sa mission');
+    expect(content).toContain('Rien n\'a bougé en lui');
+    expect(content).toContain('Écris son refus');
+    // he must not be handed a change of heart he did not have
+    expect(content).not.toContain('Il vient de passer');
+  });
+
+  it('still forbids him to recite, whichever moment it is', () => {
+    for (const moment of ['greeting', 'answered-request', 'transition'] as const) {
+      expect(promptFor(occasion({ moment }))[0]!.content).toMatch(/Ne cite JAMAIS un verset/);
+    }
+  });
+
+  it('leaves the transition prompt exactly as it always was', () => {
+    expect(promptFor(occasion())).toEqual(promptFor(occasion({ moment: 'transition' })));
+  });
+});
+
 describe('tidying what came back', () => {
   it('keeps a clean line untouched', () => {
     expect(tidy('Ne me demande pas ça.')).toBe('Ne me demande pas ça.');

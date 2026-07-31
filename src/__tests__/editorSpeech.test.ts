@@ -13,6 +13,8 @@ import { Speech } from '../editor/Speech';
  */
 
 const drawn: { text: string; font: string }[] = [];
+/** moveTo is used for one thing only: the tail that marks a plate as speech. */
+let tails = 0;
 
 beforeAll(() => {
   // 19px per character at the body size, which is about right for the serif
@@ -27,7 +29,7 @@ beforeAll(() => {
       measureText: (s: string) => ({ width: widthOf(s, font) }),
       fillText: (s: string) => drawn.push({ text: s, font }),
       clearRect: () => {}, beginPath: () => {}, roundRect: () => {}, fill: () => {},
-      stroke: () => {}, moveTo: () => {}, lineTo: () => {}, closePath: () => {},
+      stroke: () => {}, moveTo: () => { tails += 1; }, lineTo: () => {}, closePath: () => {},
       fillStyle: '', strokeStyle: '', lineWidth: 0, textAlign: '', textBaseline: '',
     };
   };
@@ -137,6 +139,47 @@ describe('the character speaks', () => {
     // the new line starts its own fade in, it does not inherit the old age
     expect(speech.sprite.material.opacity).toBeLessThan(0.2);
     expect(speech.isSpeaking).toBe(true);
+  });
+
+  /**
+   * The third voicing, and the reason it exists.
+   *
+   * When Gloo cannot answer and Scripture cannot be served either, there is one
+   * honest thing left: say what he is visibly doing. It must not be mistaken for
+   * either of the other two — a caption set in the Scripture face would make the
+   * tool appear to quote something it made up, which is the single worst thing
+   * this project could be caught doing.
+   */
+  describe('narration, when there is neither a line nor a passage', () => {
+    const narrate = (text: string) => {
+      drawn.length = 0;
+      tails = 0;
+      speech = new Speech();
+      speech.say(text, 'JON.1.3', 'narration');
+    };
+
+    it('is never set in the face reserved for Scripture', () => {
+      narrate('Il ne bouge pas.');
+      // the serif stack is the one with a book face at the head of it
+      expect(drawn.filter((d) => d.font.includes('Iowan Old Style'))).toEqual([]);
+      expect(drawn.some((d) => d.text === 'Il ne bouge pas.')).toBe(true);
+    });
+
+    it('is given no tail, because nobody said it', () => {
+      narrate('Il ne bouge pas.');
+      expect(tails).toBe(0);
+
+      drawn.length = 0;
+      tails = 0;
+      speech = new Speech();
+      speech.say('Ne me demande pas ça.', 'JON.1.3', 'utterance');
+      expect(tails).toBe(1);
+    });
+
+    it('still carries the reference, so the claim can be checked', () => {
+      narrate('Il ne bouge pas.');
+      expect(cite()).toEqual(['JON.1.3']);
+    });
   });
 
   it('draws over the body that said it, so a line is never half-occluded', () => {

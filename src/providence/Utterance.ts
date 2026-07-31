@@ -31,10 +31,27 @@ function band(value: number, low: string, middle: string, high: string): string 
   return v < 0.35 ? low : v < 0.7 ? middle : high;
 }
 
+/**
+ * Which kind of moment he is speaking from.
+ *
+ * `transition` was the only one for a long time, and that was the hole: a
+ * character spoke if and only if his arc had just moved. Ask Jonah for help,
+ * have nothing in him give way, and he said nothing at all — which reads as an
+ * empty world rather than as a refusal, though a refusal is exactly what it was.
+ *
+ * The other two are the moments a person has words for and a state machine does
+ * not: being approached, and being asked something and not moving.
+ */
+export type Moment = 'transition' | 'greeting' | 'answered-request';
+
 export interface Occasion {
   readonly arc: Arc;
   /** The node just entered. */
   readonly node: string;
+  /** Absent means `transition`, which is what this was before the other two. */
+  readonly moment?: Moment;
+  /** What was just asked of him, in the words it was asked in. Requests only. */
+  readonly asked?: string;
   /** The node left behind, when something changed this tick. */
   readonly from?: string;
   readonly directive: Directive;
@@ -118,13 +135,44 @@ export function promptFor(occasion: Occasion): Message[] {
     : covenant.standing === 'transgressor' ? 'quelqu\'un qui l\'a rompue, et cela se sait'
     : 'quelqu\'un dont on ne sait rien';
 
+  /* What is happening to him, which is not the same sentence in all three
+     moments. A greeting has nothing behind it yet, and a request that moved
+     nothing has to say so plainly, or the model writes him a change of heart he
+     did not have. */
+  const moment = occasion.moment ?? 'transition';
+  const standingIn = `Il se tient dans l'état « ${occasion.node} ».`;
+
+  const happening =
+    moment === 'greeting'
+      ? ['Quelqu\'un vient de l\'aborder. Il n\'a encore rien dit.', standingIn]
+    : moment === 'answered-request'
+      ? [
+          occasion.asked ?? 'On vient de lui demander quelque chose.',
+          'Rien n\'a bougé en lui : il ne cède pas, et il ne s\'en va pas.',
+          standingIn,
+        ]
+    : [
+        occasion.from
+          ? `Il vient de passer de « ${occasion.from} » à « ${occasion.node} ».`
+          : standingIn,
+      ];
+
+  const reason =
+    moment === 'transition'
+      ? `Le passage derrière ce changement — sa raison, pas ses mots : ${occasion.reference}.`
+      : `Ce qu'il est, dans le texte — sa raison, pas ses mots : ${occasion.reference}.`;
+
+  const write =
+    moment === 'greeting' ? 'Écris la première chose qu\'il dit, à cette personne, maintenant.'
+    : moment === 'answered-request'
+      ? 'Écris son refus, avec ses mots à lui. Il n\'explique aucune règle et ne plaide pas longuement.'
+    : 'Écris sa réplique.';
+
   const lines = [
     `Personnage : ${arc.label} (${arc.source}).`,
     `Ce qu'il résout dans le jeu : ${arc.solves}`,
     '',
-    occasion.from
-      ? `Il vient de passer de « ${occasion.from} » à « ${occasion.node} ».`
-      : `Il se tient dans l'état « ${occasion.node} ».`,
+    ...happening,
     `Ce qu'il fait à l'instant : ${directive.posture}, il ${moveInWords(directive.move)}.`,
     directive.refusing ? 'Il refuse ce qu\'on lui demande.' : '',
     '',
@@ -136,10 +184,10 @@ export function promptFor(occasion: Occasion): Message[] {
     '',
     `Devant lui : ${asker}.`,
     '',
-    `Le passage derrière ce changement — sa raison, pas ses mots : ${occasion.reference}.`,
+    reason,
     occasion.passage ? `Ce passage dit : « ${occasion.passage} »` : '',
     '',
-    'Écris sa réplique.',
+    write,
   ];
 
   return [

@@ -19,6 +19,8 @@ import type { Occasion } from '../providence/Utterance';
 import { METRES_PER_UNIT } from './Stage3D';
 import { memoryFor } from '../providence/memory';
 import { cueFor, plainly } from './Cues';
+import { Encounter, type EncounterState } from './Encounter';
+import { verbsFor, type Verb } from './Verbs';
 
 /**
  * The Providence editor.
@@ -85,9 +87,11 @@ root.innerHTML = `
 
   <main class="viewport">
     <canvas id="stage"></canvas>
+    <button class="hail" type="button" id="hail" hidden>Parler <kbd>E</kbd></button>
     <div class="cue">
       <div class="cue-doing" id="cue-doing"></div>
       <div class="cue-next" id="cue-next"></div>
+      <div class="menu" id="menu" hidden></div>
     </div>
   </main>
 
@@ -178,6 +182,16 @@ function selectArc(next: Arc): void {
   actor.standsIn(places.place);
   position = { x: 0.28, y: 0.42 };
   clock = 0;
+
+  /* Whatever was being said, was being said to somebody else. The newcomer
+     spawns inside the range that keeps a conversation open, so this cannot be
+     left to distance to sort out. */
+  encounter.forget();
+  greeting = null;
+  pending = null;
+  /* Anything still in flight is being written for the man who just left. It is
+     dropped on arrival by the speaker check inside greet(). */
+  onTheWay = null;
   stage.setArc(next);
   renderLibrary();
   renderCue();
@@ -243,13 +257,8 @@ asked.type = 'button';
 const renderAsked = (): void => {
   asked.innerHTML = `<kbd>S</kbd> ask <span class="count">${world.requestsMade}</span>`;
 };
-const ask = (): void => {
-  world.requestsMade += 1;
-  renderAsked();
-  note(`asked, from ${world.distanceToPlayer.toFixed(1)} m (${world.requestsMade} in all)`, 'LUK.18.3');
-};
 asked.addEventListener('click', () => {
-  ask();
+  play(verbNamed('ask'));
   asked.blur();
 });
 renderAsked();
@@ -261,13 +270,8 @@ kind.type = 'button';
 const renderKind = (): void => {
   kind.innerHTML = `<kbd>K</kbd> show kindness <span class="count">${world.kindnessesWitnessed}</span>`;
 };
-const beKind = (): void => {
-  world.kindnessesWitnessed += 1;
-  renderKind();
-  note(`kindness shown, and witnessed (${world.kindnessesWitnessed} in all)`, 'RUT.2.11');
-};
 kind.addEventListener('click', () => {
-  beKind();
+  play(verbNamed('kindness'));
   kind.blur();
 });
 renderKind();
@@ -281,9 +285,46 @@ window.addEventListener('keydown', (e) => {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
 
   const key = e.key.toLowerCase();
-  if (key === 's') ask();
-  else if (key === 'k') beKind();
+  if (key === 's') play(verbNamed('ask'));
+  else if (key === 'k') play(verbNamed('kindness'));
+  else if (key === 'e') speakTo();
+  else if (key === 'escape') breakOff();
 });
+
+/** The gesture by that name, aimed at whoever is standing there now. */
+function verbNamed(id: string): Verb {
+  return verbsFor(arc, actor.state).find((v) => v.id === id) as Verb;
+}
+
+/**
+ * The player does something to the man in front of him.
+ *
+ * One road for all of it — the two keys, the two toolbar buttons and the menu —
+ * so that asking from a keyboard and asking inside a conversation are the same
+ * event, reach the engine the same way, and are answered the same way.
+ */
+function play(verb: Verb): void {
+  const said = verb.apply({ world, graph: relations.graph, who: arc.id });
+  renderAsked();
+  renderKind();
+
+  if (verb.kind === 'deed') {
+    /* A deed moves where the player stands before the Law, and every arc reads
+       that. The relation panel does this for its own buttons; a deed committed
+       from the menu has to do it too, or the graph and the standing drift apart
+       and the character answers to a record that is one deed out of date. */
+    restate();
+    relations.render();
+    void report('graph', 'graph', said, verb.because);
+  } else {
+    note(`${said}, from ${world.distanceToPlayer.toFixed(1)} m`, verb.because);
+  }
+
+  /* Armed only for what a man can actually answer. If nothing in him gives way
+     within the second, he answers anyway — and that silence, where a refusal
+     belonged, was the whole of what made this look like an empty world. */
+  pending = verb.told === undefined ? null : { told: verb.told, node: actor.state, at: clock };
+}
 
 /* ------------------------------------------------------------------ */
 /* Console                                                             */
@@ -407,6 +448,156 @@ function renderCue(): void {
   cueDoingEl.textContent = cue.doing;
   cueNextEl.innerHTML = markControls(cue.next);
 }
+
+/* ------------------------------------------------------------------ */
+/* The encounter                                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Walking up to somebody and talking to them.
+ *
+ * Before this there was no such thing as addressing a person: there were two
+ * keys that moved two counters in the world, and they applied to whoever was
+ * loaded, from wherever you happened to be standing. Nothing that came back
+ * could read as him answering *you*, and when a gesture moved nothing in him he
+ * said nothing at all — which is indistinguishable from an empty world, though
+ * what had actually happened was a refusal.
+ *
+ * `Encounter` holds the rules and is asserted without a DOM. This is the part
+ * that draws them.
+ */
+const hailEl = document.getElementById('hail') as HTMLButtonElement;
+const menuEl = document.getElementById('menu') as HTMLElement;
+const encounter = new Encounter();
+
+/** His opening line, bought on the approach so the walk pays for the latency. */
+let greeting: { arcId: string; node: string; line: string | null } | null = null;
+/** A gesture waiting to see whether anything in him gives way. */
+let pending: { told: string; node: string; at: number } | null = null;
+
+/** How long he is given to move before he has to answer instead. */
+const ANSWER_AFTER = 1;
+
+/** Who is standing there, how, and before whom: the structure the voice reads. */
+const facing = () => ({
+  arc,
+  node: actor.state,
+  directive: actor.directive,
+  disposition: { ...actor.disposition },
+  standing: actor.bears,
+  covenant: world.covenant ?? NO_COVENANT,
+  reference: arc.source,
+});
+
+/**
+ * What he says, or — when nothing could be generated — what he is visibly
+ * doing, told as narration and set apart from both speech and Scripture. The
+ * one thing forbidden here is putting words in his mouth to fill the gap.
+ */
+function utter(line: string | null): void {
+  if (line) stage.say(line, arc.source, 'utterance');
+  else stage.say(plainly(actor.directive), arc.source, 'narration');
+}
+
+/** One already being written, so hailing mid-flight does not buy a second. */
+let onTheWay: { wanted: boolean } | null = null;
+
+/** Buy his opening line. `now` says whether it is wanted on screen or only kept. */
+async function greet(now: boolean): Promise<void> {
+  if (onTheWay !== null) {
+    /* Crossing the approach mark and hailing are two separate triggers, and
+       four seconds apart at most: without this, walking up and speaking buys
+       the same opening line twice and shows whichever lands second. */
+    if (now) onTheWay.wanted = true;
+    return;
+  }
+
+  const speaker = actor;
+  const node = actor.state;
+  onTheWay = { wanted: now };
+
+  const line = await voice.speak({ ...facing(), moment: 'greeting' });
+  const wanted = onTheWay?.wanted === true;
+  onTheWay = null;
+
+  if (actor !== speaker) return;
+  greeting = { arcId: arc.id, node, line };
+  if (wanted && actor.state === node) utter(line);
+}
+
+/**
+ * He was asked something and nothing in him moved. He answers that.
+ *
+ * Deliberately not through `report`: there is no transition here and so no
+ * passage behind it, and resolving one would hang a verse under a line no verse
+ * produced. He speaks from what he is, and cites nothing.
+ */
+async function answer(told: string): Promise<void> {
+  const speaker = actor;
+  const node = actor.state;
+  // no pronoun: seven of the twenty four are women and one of them is an ass
+  log.write('arc', arc.id, 'asked, and nothing moved', arc.source);
+  mark.nudge(0.55);
+
+  const line = await voice.speak({ ...facing(), moment: 'answered-request', asked: told });
+  if (actor !== speaker || actor.state !== node) return;
+  utter(line);
+}
+
+function speakTo(): void {
+  if (!encounter.hail()) return;
+  renderMenu();
+  if (greeting !== null && greeting.arcId === arc.id && greeting.node === actor.state) {
+    utter(greeting.line);
+  } else {
+    void greet(true);
+  }
+  note(`you spoke to ${arc.id}`, 'JHN.4.7');
+}
+
+function breakOff(): void {
+  if (encounter.dismiss()) note('you stopped asking', 'ECC.3.7');
+}
+
+function renderMenu(): void {
+  menuEl.replaceChildren();
+  for (const verb of verbsFor(arc, actor.state)) {
+    const button = document.createElement('button');
+    button.className = 'choice';
+    button.type = 'button';
+    button.textContent = verb.label;
+    button.addEventListener('click', () => {
+      play(verb);
+      /* Leaving is the only one that closes it. Ruth wants two kindnesses and
+         the judge wants six asks, and a menu that shuts on every click puts
+         both of them out of reach. */
+      if (verb.kind === 'leave') breakOff();
+      button.blur();
+    });
+    menuEl.appendChild(button);
+  }
+}
+
+/** The offer over his head, or the menu standing in for the cue. */
+function renderEncounter(state: EncounterState): void {
+  const open = state === 'open';
+  menuEl.hidden = !open;
+  cueDoingEl.hidden = open;
+  cueNextEl.hidden = open;
+
+  hailEl.hidden = state !== 'near';
+  if (state !== 'near') return;
+
+  // pinned to the man it concerns, rather than being one more control in a row
+  const head = stage.headAt();
+  hailEl.style.left = `${(head.x * 100).toFixed(2)}%`;
+  hailEl.style.top = `${(head.y * 100).toFixed(2)}%`;
+}
+
+hailEl.addEventListener('click', () => {
+  speakTo();
+  hailEl.blur();
+});
 
 function renderInspector(): void {
   if (panel === 'relations') {
@@ -571,6 +762,9 @@ function frame(now: number): void {
 
   const event = actor.update(dt, world);
   if (event) {
+    /* Something in him gave way, so the transition speaks for him and whatever
+       gesture was waiting on an answer has had one. */
+    pending = null;
     void report('arc', arc.id, `${event.from} → ${event.to}`, event.because, {
       arc,
       node: event.to,
@@ -582,6 +776,26 @@ function frame(now: number): void {
       covenant: world.covenant ?? NO_COVENANT,
       reference: event.because,
     });
+  } else if (pending !== null && clock - pending.at > ANSWER_AFTER) {
+    /* A second has passed and nothing gave way. He is not indifferent, he is
+       refusing, and until now the difference reached the player as silence. */
+    const told = pending.told;
+    pending = null;
+    void answer(told);
+  }
+
+  /* Where the two of them stand toward each other, which is not the same
+     question as where they stand on the ground. An open conversation does not
+     survive him changing state: the soul does not wait for the menu. */
+  const beat = encounter.observe({ metres: world.distanceToPlayer, moved: event !== null });
+  if (beat.prepare) void greet(false);
+  if (beat.ended !== null) {
+    note(
+      beat.ended === 'he-moved'
+        ? 'the arc moved, and took the conversation with it'
+        : 'walked off while you were still asking',
+      'ECC.3.7',
+    );
   }
 
   /* Grace watches how closed the situation is. Standing next to the player with
@@ -607,6 +821,8 @@ function frame(now: number): void {
   ]);
 
   stage.render(dt, actor.directive, actor.disposition, actor.bears, weather, player, position, errand);
+  // after the render, because the offer is pinned to where his head just landed
+  renderEncounter(beat.state);
   renderCue();
   renderInspector();
   refreshApiState();
