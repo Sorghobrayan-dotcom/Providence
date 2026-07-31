@@ -9,9 +9,9 @@ than a day.
 
 | | |
 | --- | --- |
-| engine | 4,889 lines across 20 modules |
-| tests | 5,084 lines, 416 assertions in 31 files |
-| editor | 3,162 lines, 108 assertions in 7 files |
+| engine | 4,998 lines across 20 modules |
+| tests | 5,261 lines, 427 assertions in 31 files |
+| editor | 3,215 lines, 108 assertions in 7 files |
 | notebook | 47 cells, 25 of them executable, all passing |
 | bundle | 59 kB for the editor, 482 kB for Three.js |
 
@@ -52,16 +52,29 @@ toolbar's and stretched it, the approach threshold sat above the distance a newl
 loaded character spawns at so every click down the library bought a generated
 line, and the menu was wide enough to cover the person it was about.
 
+**Being sold now costs something, and fleeing means leaving.** `memory.betrayals`
+was read at exactly one threshold — how many kindnesses mend Peter's own denial —
+so selling a man while he walked beside you changed nothing at all. He now goes,
+and four kindnesses a betrayal is the price of getting him back, which is what
+Proverbs 18:19 costs. And `away-from-player` was a mirror, which points into the
+wall behind a fleeing man and holds him there while whoever is following strolls
+up: measured, the mirror leaves Jonah motionless against an edge for 2,805 ticks
+of a 3,000-tick chase, and `evading` for none of them. Driving that found one
+more: `requestsMade` and `kindnessesWitnessed` survived a change of character, so
+everyone after the first arrived already asked and already credited with a
+kindness shown to somebody else.
+
 ## What does not hold up
 
 **`main.ts` and `Stage3D.ts` still have no tests.** This was the worst thing on
 the list and most of it is now closed: `Bearing`, `Speech`, the console, the
 logo, the cues, the relation panel, the encounter and the verbs carry 108
-assertions between them. What is left is the 1,285 lines of wiring in `main.ts`
+assertions between them. What is left is the 1,330 lines of wiring in `main.ts`
 and the viewport, and the wiring is where every remaining bug has been found —
 the boot path that set the first arc up by hand, the cast that left it out of
-the graph, and the three from the conversation above. It is now the largest
-untested file in the repository by some distance, and it grew again this week.
+the graph, the three from the conversation above, and the two counters that
+survived a load. It is now the largest untested file in the repository by some
+distance, and it grew again this week.
 
 **Godot ships 4 arcs, not 24.** A transition holds a predicate, and a predicate
 is code rather than data, so it cannot be exported from the TypeScript and

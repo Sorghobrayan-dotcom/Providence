@@ -47,11 +47,12 @@ Starting disposition: trust 0.85, fear 0.1, resolve 0.9.
 | state | intends | drifts | goes to |
 | --- | --- | --- | --- |
 | `willing` | hold · ready | — | `following` (LUK.22.33) |
-| `following` | toward-player · sworn · companion | — | `pressed` (LUK.22.54) |
-| `pressed` | hold · wary · companion | fear +0.09/s, trust -0.02/s | `denying` (LUK.22.57)<br>`following` (LUK.22.33) |
+| `following` | toward-player · sworn · companion | — | `offended` (PSA.41.9)<br>`pressed` (LUK.22.54) |
+| `offended` | away-from-player · offended · refusing | trust -0.05/s | `following` (PRO.18.19) |
+| `pressed` | hold · wary · companion | fear +0.09/s, trust -0.02/s | `offended` (PSA.41.9)<br>`denying` (LUK.22.57)<br>`following` (LUK.22.33) |
 | `denying` | away-from-player · denying · refusing | trust -0.12/s | `weeping` (LUK.22.62) |
 | `weeping` | hold · withdrawn | fear -0.08/s | `restored` (JHN.21.17) |
-| `restored` | toward-player · steadfast · companion | trust +0.04/s | `pressed` (LUK.22.54) |
+| `restored` | toward-player · steadfast · companion | trust +0.04/s | `offended` (PSA.41.9)<br>`pressed` (LUK.22.54) |
 
 
 ### Celle Qui Choisit  `ruth`

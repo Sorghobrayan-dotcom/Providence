@@ -14,7 +14,7 @@ import { approachFor, paceFor } from './Bearing';
 import { GlooVoice } from '../api/GlooVoice';
 import { covenantOf, NO_COVENANT } from '../providence/covenant';
 import { gather, situationsIn, testimonyOf } from '../providence/testimony';
-import { headingFor, spaceFor, wayFor } from '../providence/ways';
+import { evading, headingFor, spaceFor, wayFor } from '../providence/ways';
 import type { Occasion } from '../providence/Utterance';
 import { METRES_PER_UNIT } from './Stage3D';
 import { memoryFor } from '../providence/memory';
@@ -186,6 +186,18 @@ function selectArc(next: Arc): void {
   /* Whatever was being said, was being said to somebody else. The newcomer
      spawns inside the range that keeps a conversation open, so this cannot be
      left to distance to sort out. */
+  /* Per NPC, by their own definitions: `requestsMade` counts what this one has
+     been asked and `kindnessesWitnessed` counts what this one saw. They were
+     surviving a load, so every character after the first arrived already asked
+     and already credited with a kindness shown to somebody else — Jonah opened
+     mid-arc because Peter had been spoken to. The graph deliberately does not
+     reset with them: a deed is public record and the ledger does not forget,
+     and that difference between the two is the argument the library is making. */
+  world.requestsMade = 0;
+  world.kindnessesWitnessed = 0;
+  renderAsked();
+  renderKind();
+
   encounter.forget();
   greeting = null;
   pending = null;
@@ -366,13 +378,25 @@ async function report(
     const spoken = await voice.speak(line ? { ...occasion, passage: line.text } : occasion);
     if (actor !== speaker || actor.state !== spokenFrom) return;
 
-    if (spoken) {
+    if (spoken && withinEarshot()) {
       stage.say(spoken, ref, 'utterance');
       return;
     }
   }
-  if (line) stage.say(line.text, line.reference, 'scripture');
+  if (line && withinEarshot()) stage.say(line.text, line.reference, 'scripture');
 }
+
+/**
+ * Close enough to be heard.
+ *
+ * Jonah crosses four or five states on his way out of the field, and every one
+ * of them used to put a plate over his head — so a man sprinting away from you
+ * kept up a running commentary from the far side of the world. The console
+ * still records all of it, with the passage under each line. He simply stops
+ * being audible, which is what distance does.
+ */
+const EARSHOT_METRES = 12;
+const withinEarshot = (): boolean => world.distanceToPlayer <= EARSHOT_METRES;
 
 function note(what: string, ref: string): void {
   log.write('editor', 'editor', what, ref);
@@ -683,6 +707,15 @@ function renderInspector(): void {
 
 const stage = new Stage3D(canvas);
 
+/**
+ * The ground, in the editor's own 0..1 space. It was three separate pairs of
+ * clamp literals scattered through the movement code; a body that flees has to
+ * know where the edge is before it reaches it, so the edge is named once.
+ */
+const FIELD = { minX: 0.04, maxX: 0.96, minY: 0.06, maxY: 0.94 };
+/** How far ahead a fleeing body looks for the wall. About two metres. */
+const LOOKAHEAD = 0.11;
+
 let dragging = false;
 const toLocal = (e: PointerEvent): { x: number; y: number } => {
   const r = canvas.getBoundingClientRect();
@@ -705,11 +738,23 @@ function applyDirective(dt: number): void {
   // where it goes is the library's call; how urgently it gets there is what it
   // feels about going, which is the whole point of the disposition
   const speed = 0.16 * dt * paceFor(actor.disposition, actor.directive.move, clock);
+
+  /* Fleeing is its own problem and it is not the mirror it used to be. A body
+     walking at the player's reflection walks into the wall behind it, clamps,
+     and is collected by anyone strolling after it — so Jonah did not flee, he
+     parked in a corner. `evading` picks the heading that keeps leaving with
+     ground still under him, and returns the mirror untouched in the open. */
+  if (actor.directive.move === 'away-from-player' || actor.directive.move === 'away-from-errand') {
+    const after = actor.directive.move === 'away-from-player' ? player : errand;
+    const heading = evading(position, after, FIELD, LOOKAHEAD);
+    position.x = Math.max(FIELD.minX, Math.min(FIELD.maxX, position.x + Math.cos(heading) * speed));
+    position.y = Math.max(FIELD.minY, Math.min(FIELD.maxY, position.y + Math.sin(heading) * speed));
+    return;
+  }
+
   const target =
     actor.directive.move === 'toward-player' ? player :
-    actor.directive.move === 'away-from-player' ? { x: 2 * position.x - player.x, y: 2 * position.y - player.y } :
     actor.directive.move === 'toward-errand' ? errand :
-    actor.directive.move === 'away-from-errand' ? { x: 2 * position.x - errand.x, y: 2 * position.y - errand.y } :
     null;
 
   if (!target) return;
@@ -735,8 +780,8 @@ function applyDirective(dt: number): void {
   if (step <= 0) return;
 
   const heading = headingFor(way, Math.atan2(dy, dx), clock, gap * METRES_PER_UNIT);
-  position.x = Math.max(0.04, Math.min(0.96, position.x + Math.cos(heading) * step));
-  position.y = Math.max(0.06, Math.min(0.94, position.y + Math.sin(heading) * step));
+  position.x = Math.max(FIELD.minX, Math.min(FIELD.maxX, position.x + Math.cos(heading) * step));
+  position.y = Math.max(FIELD.minY, Math.min(FIELD.maxY, position.y + Math.sin(heading) * step));
 }
 
 /* ------------------------------------------------------------------ */

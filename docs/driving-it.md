@@ -64,9 +64,19 @@ The whole thesis in one character. **Le Serment Brise**, top of the library.
 7. Now toggle **under threat** again. He breaks faster this time. The threshold
    moved because he has a scar, and the scar is counted, not scripted.
 
-Then do it again, and before step 6 open **Relations** and press *betray peter*.
-The same three kindnesses no longer reach him: every betrayal in the ledger adds
-two more. Nothing in his arc mentions betrayal — it reads the graph.
+Now reload him and do something else entirely. Ask him, let him swear, and then
+— with no threat anywhere, nothing frightening him — press *Trahis-le*.
+
+He leaves. Not the denial: no fear, no tears, no walking it back with a kind
+word. He turns his back and puts distance between you, and four kindnesses is
+what it costs to get him to stand next to you again. Betray him twice and it is
+eight. A brother offended is harder to be won than a strong city, and the arc
+charges exactly that.
+
+Get him back, then break him under threat as before, and the second claim shows:
+the four that brought him back no longer mend the denial. Every betrayal in the
+ledger adds two on top of the three. Nothing in his arc mentions the word — it
+reads the graph.
 
 ## Jonah, and why the same question has two answers
 

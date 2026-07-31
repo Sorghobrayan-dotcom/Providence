@@ -61,6 +61,73 @@ describe('a wound reopens faster than it first opened', () => {
   });
 });
 
+/**
+ * The thing the arc could not say.
+ *
+ * `memory.betrayals` was read at exactly one threshold — how many kindnesses
+ * mend his own denial — so selling a man while he walked beside you changed
+ * nothing whatever. He kept following, kept swearing, and broke later for fear
+ * and not for you. A companion who is indifferent to being sold is the flattest
+ * thing in a library built to argue that a bond is not a number.
+ */
+describe('a man you sold does not simply carry on following you', () => {
+  const betrayed = (times = 1): Actor => {
+    const graph = new RelationGraph();
+    graph.bind('peter', 'player', 'covenant', 0.9);
+    for (let i = 0; i < times; i += 1) {
+      graph.commit({ kind: 'betray', actor: 'player', toward: 'peter' });
+    }
+    return new Actor(PETER, memoryFor(graph, 'peter'));
+  };
+
+  it('leaves your side, with no threat anywhere near him', () => {
+    const peter = betrayed();
+    expect(reach(peter, 'offended', {})).toBeGreaterThanOrEqual(0);
+    expect(peter.directive.companion).toBeUndefined();
+    expect(peter.directive.refusing).toBe(true);
+    expect(peter.directive.move).toBe('away-from-player');
+  });
+
+  it('is not the denial, which needs a threat and ends in weeping', () => {
+    const peter = betrayed();
+    reach(peter, 'offended', {});
+    run(peter, 30, {});
+    expect(peter.state).toBe('offended');
+    expect(peter.journal.some((e) => e.to === 'denying')).toBe(false);
+  });
+
+  it('is not won back by the three kindnesses that mend his own denial', () => {
+    const peter = betrayed();
+    reach(peter, 'offended', {});
+    run(peter, 40, { kindnessesWitnessed: 3 });
+    expect(peter.state).toBe('offended');
+  });
+
+  it('comes back at four, and then stays', () => {
+    const peter = betrayed();
+    reach(peter, 'offended', {});
+    expect(reach(peter, 'following', { kindnessesWitnessed: 4 })).toBeGreaterThanOrEqual(0);
+    run(peter, 20, { kindnessesWitnessed: 4 });
+    expect(peter.state).toBe('following');
+  });
+
+  it('charges four more for the second time you do it', () => {
+    const peter = betrayed(2);
+    reach(peter, 'offended', {});
+    run(peter, 40, { kindnessesWitnessed: 7 });
+    expect(peter.state).toBe('offended');
+    expect(reach(peter, 'following', { kindnessesWitnessed: 8 })).toBeGreaterThanOrEqual(0);
+  });
+
+  it('leaves a man who was never sold exactly where he was', () => {
+    const clean = new RelationGraph();
+    clean.bind('peter', 'player', 'covenant', 0.9);
+    const peter = new Actor(PETER, memoryFor(clean, 'peter'));
+    run(peter, 30, {});
+    expect(peter.state).toBe('following');
+  });
+});
+
 describe('coming back costs more when the record says you sold him once', () => {
   it('needs three kindnesses from a clean slate, and more after a betrayal', () => {
     const clean = new RelationGraph();
@@ -75,11 +142,17 @@ describe('coming back costs more when the record says you sold him once', () => 
     scarred.bind('peter', 'player', 'covenant', 0.9);
     scarred.commit({ kind: 'betray', actor: 'player', toward: 'peter' });
     const wary = new Actor(PETER, memoryFor(scarred, 'peter'));
-    reach(wary, 'denying', { underThreat: true });
-    reach(wary, 'weeping', {});
 
-    // three is no longer enough for a man you have already sold
-    run(wary, 40, { kindnessesWitnessed: 3 });
+    /* He walks off first now. Selling a man ends his company before it has any
+       bearing on the price of mending his own denial, so the route to that
+       second claim runs through winning him back. */
+    reach(wary, 'offended', {});
+    reach(wary, 'following', { kindnessesWitnessed: 4 });
+    reach(wary, 'denying', { underThreat: true, kindnessesWitnessed: 4 });
+    reach(wary, 'weeping', { kindnessesWitnessed: 4 });
+
+    // the four that brought him back are no longer enough to mend the denial
+    run(wary, 40, { kindnessesWitnessed: 4 });
     expect(wary.state).toBe('weeping');
 
     reach(wary, 'restored', { kindnessesWitnessed: 5 });

@@ -158,6 +158,72 @@ export function headingFor(way: Way, desired: number, seconds: number, metres: n
   return desired + (way.veer + swung) * held;
 }
 
+/** A rectangle a creature may not leave, in whatever units the host works in. */
+export interface Field {
+  readonly minX: number;
+  readonly maxX: number;
+  readonly minY: number;
+  readonly maxY: number;
+}
+
+/** Headings tried, from straight away outward. Fifteen degrees apart. */
+const LOOKS = 24;
+const APART = Math.PI / 12;
+
+/**
+ * Which way to go to keep leaving, as opposed to where "away" points.
+ *
+ * The directive says `away-from-player` and the obvious reading of that is a
+ * mirror: reflect the pursuer through the body and walk at the reflection. It
+ * is right in open ground and it is exactly wrong at a boundary, because the
+ * mirror goes on pointing into the wall, the body clamps against it, and
+ * whoever is following walks up to a man who is running as hard as he can.
+ * Every claim the arcs make about Jonah dies on that one line: he does not
+ * flee, he parks in a corner and waits.
+ *
+ * So this asks a different question. Not "which way is away" but "of the ways
+ * I could go, which one leaves me furthest from him with ground still under
+ * me". Straight away wins whenever it is available — the candidates are walked
+ * outward from it and ties keep the earlier one — so nothing changes in the
+ * open, and the turn only appears where the mirror would have failed.
+ *
+ * It reads only what is in front of it, so there is no hysteresis to tune and
+ * no state to get out of step: the same position and the same pursuer always
+ * give the same heading.
+ */
+export function evading(
+  at: { x: number; y: number },
+  pursuer: { x: number; y: number },
+  field: Field,
+  margin: number,
+): number {
+  const away = Math.atan2(at.y - pursuer.y, at.x - pursuer.x);
+
+  let best = away;
+  let bestScore = -Infinity;
+
+  for (let i = 0; i < LOOKS; i += 1) {
+    // 0, −15°, +15°, −30°, +30° … so the straight line is tried first
+    const heading = away + Math.ceil(i / 2) * APART * (i % 2 === 0 ? 1 : -1);
+    const x = at.x + Math.cos(heading) * margin;
+    const y = at.y + Math.sin(heading) * margin;
+
+    const room = Math.min(x - field.minX, field.maxX - x, y - field.minY, field.maxY - y);
+    if (room < 0) continue;
+
+    /* Distance gained is the point; room is a tie-breaker worth a fraction of
+       it, which is what stops him running the length of a wall with his
+       shoulder against it when the open field is a step to his left. */
+    const score = Math.hypot(x - pursuer.x, y - pursuer.y) + Math.min(room, margin) * 0.5;
+    if (score > bestScore) {
+      bestScore = score;
+      best = heading;
+    }
+  }
+
+  return best;
+}
+
 /**
  * How close this way insists on getting.
  *

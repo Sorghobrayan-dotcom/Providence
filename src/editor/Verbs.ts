@@ -100,6 +100,10 @@ const ASKS: Record<string, Asking> = {
     label: 'Demande-lui de revenir.',
     told: 'On vient de lui demander de revenir, après ce qu\'il a fait.',
   },
+  'peter.offended': {
+    label: 'Demande-lui de te pardonner.',
+    told: 'On vient de lui demander pardon, après l\'avoir vendu.',
+  },
   peter: {
     label: 'Demande-lui de tenir bon.',
     told: 'On vient de lui demander de tenir bon, quoi qu\'il arrive.',

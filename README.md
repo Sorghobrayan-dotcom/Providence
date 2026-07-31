@@ -26,11 +26,15 @@ is the older prototype described at the bottom of this file.
 24 NPC behaviours taken from figures in the text. The reason to look there is
 that game characters never change, and biblical ones do almost nothing else.
 
-Jonah runs from the errand you just gave him, and when circumstance drags him
-back he obeys and sulks about it. Peter denies you under pressure and cannot be
-bought back, only restored. Balaam's donkey sees what the rider cannot and
-overrules the player's own input. The serpent never fights: it offers something
-genuinely useful and is gone before the consequence lands.
+Jonah runs from the errand you just gave him, and he runs properly: wherever you
+go he takes the line that keeps leaving, rather than the reflection that walks
+him into a wall and holds him there. When circumstance drags him back he obeys
+and sulks about it. Peter denies you under pressure and cannot be bought back,
+only restored — and if you sell him while he is at your side he simply goes, and
+four kindnesses a betrayal is what winning him back costs. Balaam's donkey sees
+what the rider cannot and overrules the player's own input. The serpent never
+fights: it offers something genuinely useful and is gone before the consequence
+lands.
 
 Each arc is a set of nodes and transitions. A transition carries the condition
 that fires it and the passage it comes from, and nothing else.
@@ -202,7 +206,7 @@ TypeScript and re-read: it has to be written again. See `godot/README.md`.
 npm test
 ```
 
-416 of them. The ones worth reading first are in
+427 of them. The ones worth reading first are in
 `src/__tests__/providenceIntegrity.test.ts`, which assert the claims this project
 makes about itself, and `providenceEndToEnd.test.ts`, which runs one story
 through every part of the engine at once and calls the real platform.

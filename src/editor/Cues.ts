@@ -128,6 +128,10 @@ const CUES: Record<string, Cue> = {
     doing: 'He is not merely declining to help. He is denying he has ever known you.',
     next: 'Toggle under threat off.',
   },
+  'peter.offended': {
+    doing: 'You sold him. This is not the denial — nothing frightened him, and there are no tears in it. He is done, and he has gone.',
+    next: 'Press K four times. A brother offended is harder to win than a walled city, and every betrayal standing in the ledger adds four more.',
+  },
   'peter.weeping': {
     doing: 'He is out, and he cannot be bought, persuaded or paid back in. Only restored.',
     next: 'Press K three times. Betray him in Relations first and the same door costs two more kindnesses for every betrayal standing in the ledger.',

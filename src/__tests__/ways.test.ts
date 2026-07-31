@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { STRAIGHT, WAYS, headingFor, spaceFor, wayFor } from '../providence/ways';
+import { STRAIGHT, WAYS, evading, headingFor, spaceFor, wayFor } from '../providence/ways';
 
 /**
  * The shape of the line, not the destination.
@@ -172,5 +172,109 @@ describe('it refuses to produce nonsense', () => {
       expect(way.source, id).toMatch(/^[A-Z0-9]{3}\.\d+\.\d+$/);
       expect(way.note.length, id).toBeGreaterThan(20);
     }
+  });
+});
+
+/**
+ * Leaving, as opposed to pointing away.
+ *
+ * `away-from-player` was computed as a mirror: reflect the player through the
+ * body and walk at the reflection. In open ground that is fine and it is exactly
+ * wrong at a boundary, because the mirror keeps pointing into the wall, the
+ * body clamps against it, and whoever is following strolls up to a man who is
+ * running as hard as he can. Everything the arcs say about Jonah is undone by
+ * that one line: he does not flee, he parks in a corner.
+ */
+describe('leaving, as opposed to pointing away', () => {
+  const FIELD = { minX: 0.04, maxX: 0.96, minY: 0.06, maxY: 0.94 };
+  const SPEED = 0.02;
+  const MARGIN = 0.06;
+
+  const mirror = (at: { x: number; y: number }, after: { x: number; y: number }): number =>
+    Math.atan2(at.y - after.y, at.x - after.x);
+
+  /**
+   * A pursuer that walks straight at him, at exactly his own speed, from a
+   * corner. Same speed on purpose: nobody should be caught, so being caught can
+   * only mean the ground was used against him.
+   */
+  function chase(
+    pick: (at: { x: number; y: number }, after: { x: number; y: number }) => number,
+    ticks = 600,
+    start: { x: number; y: number } = { x: 0.06, y: 0.08 },
+    from: { x: number; y: number } = { x: 0.34, y: 0.30 },
+  ) {
+    let at = { ...start };
+    let after = { ...from };
+    let closest = Infinity;
+    let pinned = 0;
+    let worstPin = 0;
+    let travelled = 0;
+    let caughtAt = -1;
+
+    for (let t = 0; t < ticks; t += 1) {
+      const heading = pick(at, after);
+      const x = Math.max(FIELD.minX, Math.min(FIELD.maxX, at.x + Math.cos(heading) * SPEED));
+      const y = Math.max(FIELD.minY, Math.min(FIELD.maxY, at.y + Math.sin(heading) * SPEED));
+      travelled += Math.hypot(x - at.x, y - at.y);
+      at = { x, y };
+
+      const toward = Math.atan2(at.y - after.y, at.x - after.x);
+      after = { x: after.x + Math.cos(toward) * SPEED, y: after.y + Math.sin(toward) * SPEED };
+
+      const gap = Math.hypot(at.x - after.x, at.y - after.y);
+      closest = Math.min(closest, gap);
+      if (caughtAt < 0 && gap < 0.04) caughtAt = t;
+
+      const room = Math.min(at.x - FIELD.minX, FIELD.maxX - at.x, at.y - FIELD.minY, FIELD.maxY - at.y);
+      pinned = room < 1e-6 ? pinned + 1 : 0;
+      worstPin = Math.max(worstPin, pinned);
+    }
+    return { closest, worstPin, travelled, caughtAt };
+  }
+
+  /* What is NOT claimed here, because it is not true: that he cannot be caught.
+     A pursuer of equal speed running straight at him always closes eventually
+     inside a bounded field, and the editor's player is dragged by a mouse and so
+     has no speed limit at all. The defect was never that he lost the race. It
+     was that he stopped running. */
+
+  it('is held against a wall by the mirror, motionless, until collected', () => {
+    const run = chase(mirror, 3000);
+    expect(run.worstPin).toBeGreaterThan(2000);
+    expect(run.closest).toBeLessThan(0.05);
+  });
+
+  it('never stops, and never spends a single tick pinned', () => {
+    const run = chase((at, after) => evading(at, after, FIELD, MARGIN), 3000);
+    expect(run.worstPin).toBe(0);
+    // full speed on every tick of the run, rather than grinding against a wall
+    expect(run.travelled).toBeCloseTo(3000 * SPEED, 5);
+  });
+
+  it('buys real time against the same pursuer, from the open ground', () => {
+    const from = { x: 0.5, y: 0.5 };
+    const behind = { x: 0.75, y: 0.5 };
+    const pinned = chase(mirror, 3000, from, behind).caughtAt;
+    const slipped = chase((at, after) => evading(at, after, FIELD, MARGIN), 3000, from, behind).caughtAt;
+
+    // both start by running dead away; the difference is what the wall does
+    expect(pinned).toBeGreaterThan(0);
+    expect(slipped).toBeGreaterThan(pinned * 1.3);
+  });
+
+  it('goes straight away when there is nothing in the way, so nothing else changes', () => {
+    const at = { x: 0.5, y: 0.5 };
+    const after = { x: 0.3, y: 0.5 };
+    expect(evading(at, after, FIELD, MARGIN)).toBeCloseTo(mirror(at, after), 6);
+  });
+
+  it('turns rather than walks into the edge it is backed against', () => {
+    const at = { x: 0.05, y: 0.5 };
+    const after = { x: 0.2, y: 0.5 };
+    const heading = evading(at, after, FIELD, MARGIN);
+    // the mirror here is due west, straight into the wall he is already on
+    expect(Math.cos(heading)).toBeGreaterThan(Math.cos(mirror(at, after)));
+    expect(at.x + Math.cos(heading) * MARGIN).toBeGreaterThanOrEqual(FIELD.minX);
   });
 });

@@ -1,4 +1,4 @@
-import type { Arc } from './types';
+import type { Arc, Transition } from './types';
 
 /**
  * Four arcs, chosen because each defines a different RELATIONSHIP to the player:
@@ -162,6 +162,21 @@ export const JONAH: Arc = {
   ],
 };
 
+/**
+ * Being sold, written once and hung on all three nodes where he is at your side.
+ *
+ * The guard is the mirror image of the way back out of `offended`, so the two
+ * are exact complements: pay the price and he returns and stays, betray him
+ * again and the price moves and he goes again. Without the second half he would
+ * bounce out of `following` on the frame he arrived, forever.
+ */
+const offence: Transition = {
+  to: 'offended',
+  when: (c) => c.memory.betrayals > 0 && c.world.kindnessesWitnessed < 4 * c.memory.betrayals,
+  because: 'PSA.41.9',
+  note: 'celui qui mangeait mon pain a leve le talon contre moi',
+};
+
 /** Peter — loyalty that breaks under pressure and can be restored. Luke 22, John 21. */
 export const PETER: Arc = {
   id: 'peter',
@@ -192,6 +207,7 @@ export const PETER: Arc = {
       id: 'following',
       directive: { move: 'toward-player', posture: 'sworn', companion: true },
       transitions: [
+        offence,
         {
           to: 'pressed',
           when: (c) => c.world.underThreat,
@@ -201,10 +217,36 @@ export const PETER: Arc = {
       ],
     },
     {
+      /**
+       * Sold, and gone.
+       *
+       * Not the denial, which is his own failure under fear and ends in tears.
+       * This is the other wound and it runs the other way: nothing frightened
+       * him, you sold him, and the company is over. Until this existed
+       * `memory.betrayals` was read at exactly one threshold and a betrayed
+       * companion carried on walking beside you as though nothing had happened.
+       */
+      id: 'offended',
+      directive: { move: 'away-from-player', posture: 'offended', refusing: true },
+      drift: { trust: -0.05 },
+      transitions: [
+        {
+          /* Winnable, and dear. The text does not say a brother offended is
+             unreachable; it says he is harder to reach than a walled city, and
+             four kindnesses a betrayal is what that costs here. */
+          to: 'following',
+          when: (c) => c.world.kindnessesWitnessed >= 4 * c.memory.betrayals,
+          because: 'PRO.18.19',
+          note: 'un frere offense est plus difficile a gagner qu une ville forte',
+        },
+      ],
+    },
+    {
       id: 'pressed',
       directive: { move: 'hold', posture: 'wary', companion: true },
       drift: { fear: 0.09, trust: -0.02 },
       transitions: [
+        offence,
         {
           // it took a great deal to break him the first time. It takes less
           // afterwards, which is what a scar is
@@ -257,6 +299,7 @@ export const PETER: Arc = {
       directive: { move: 'toward-player', posture: 'steadfast', companion: true },
       drift: { trust: 0.04 },
       transitions: [
+        offence,
         {
           /* Restoration is not immunity. He can be put in the same room again,
              and the wound he already carries is what makes the second time
