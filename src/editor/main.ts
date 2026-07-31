@@ -482,7 +482,15 @@ function frame(now: number): void {
   last = now;
   clock += dt;
 
-  world.distanceToPlayer = Math.hypot(player.x - position.x, player.y - position.y) * 40;
+  /* Metres, on the same scale the renderer and Bearing use. This was a bare 40
+     against a world that is 18 metres across, so the library saw every distance
+     as more than twice what was on screen. The consequence was not cosmetic:
+     Bearing stops a wary stranger 2.95 m away, which read as 6.5 to the arcs,
+     and every node that opens at `distanceToPlayer < 3` was therefore
+     unreachable. Characters could not be approached closely enough to answer,
+     which is exactly how it felt. */
+  world.distanceToPlayer =
+    Math.hypot(player.x - position.x, player.y - position.y) * METRES_PER_UNIT;
   world.hasLethalAdvantage = world.distanceToPlayer < 3;
 
   const event = actor.update(dt, world);

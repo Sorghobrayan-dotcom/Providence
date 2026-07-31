@@ -208,8 +208,12 @@ export const GOLIATH: Arc = {
   nodes: [
     {
       id: 'presenting',
-      // he attacks nobody. He stands there and the whole party stops advancing.
-      directive: { move: 'hold', posture: 'taunting', hostile: true, suppressesParty: true },
+      /* He attacks nobody, and he does not wait either: the Philistine came on
+         and drew near, morning and evening, for forty days. Holding still made
+         the ways entry written for him unreachable, and made the one thing he
+         does - close the distance while you decide nothing - impossible to
+         feel. The party still stops advancing; he is the one who moves. */
+      directive: { move: 'toward-player', posture: 'taunting', hostile: true, suppressesParty: true },
       drift: { resolve: 0.02 },
       transitions: [
         {

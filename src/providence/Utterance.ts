@@ -68,6 +68,27 @@ const SYSTEM = [
 ].join('\n');
 
 /**
+ * Whose words are not evidence of their state.
+ *
+ * Everything else here assumes a character says roughly what he is: a
+ * frightened man sounds frightened. These four do not, and running them
+ * through the same prompt makes the most dangerous arc in the library sound
+ * like an anxious one. The serpent's method is a question asked in apparent
+ * good faith, and a prompt that only describes his disposition cannot produce
+ * it — his disposition is calm, and calm is not the point.
+ */
+const DECEIVERS = new Set(['serpent', 'tempter', 'delilah', 'jezebel']);
+
+const DECEPTION = [
+  '',
+  'CE PERSONNAGE MENT. Il ne dit pas ce qu\'il veut vraiment, et il ne montre pas',
+  'ce qu\'il ressent vraiment. Sa réplique doit paraître raisonnable, serviable ou',
+  'bienveillante, tout en poussant la personne à douter, à renoncer, ou à prendre',
+  'le mauvais chemin. Il ne menace jamais ouvertement : il suggère.',
+  'N\'écris pas qu\'il ment. Écris ce qu\'il dit.',
+].join('\n');
+
+/**
  * Turn an occasion into the messages that produce the line.
  *
  * Pure and exported so it can be asserted against without a network: the prompt
@@ -122,7 +143,7 @@ export function promptFor(occasion: Occasion): Message[] {
   ];
 
   return [
-    { role: 'system', content: SYSTEM },
+    { role: 'system', content: DECEIVERS.has(arc.id) ? SYSTEM + DECEPTION : SYSTEM },
     { role: 'user', content: lines.filter((l) => l !== '').join('\n') },
   ];
 }

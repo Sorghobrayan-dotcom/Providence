@@ -87,8 +87,13 @@ describe('Goliath — suppresses the party instead of fighting it', () => {
     const g = new Actor(GOLIATH);
     for (let t = 0; t < 40; t++) g.update(1, world({ distanceToPlayer: 30 }));
     expect(g.state).toBe('presenting');
+
+    /* The suppression is the claim, and it is unchanged: the party does not
+       advance. What changed is that he is no longer the one standing still.
+       He presented himself morning and evening for forty days and drew nearer,
+       which is the pressure - waiting is what the party does, not what he does. */
     expect(g.directive.suppressesParty).toBe(true);
-    expect(g.directive.move).toBe('hold');
+    expect(g.directive.move).toBe('toward-player');
   });
 
   it('the suppression breaks when one person comes close alone', () => {

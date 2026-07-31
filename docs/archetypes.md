@@ -244,7 +244,7 @@ Starting disposition: trust 0, fear 0, resolve 1.
 
 | state | intends | drifts | goes to |
 | --- | --- | --- | --- |
-| `presenting` | hold · taunting · hostile, suppressesParty | resolve +0.02/s | `answered` (1SA.17.32) |
+| `presenting` | toward-player · taunting · hostile, suppressesParty | resolve +0.02/s | `answered` (1SA.17.32) |
 | `answered` | toward-player · advancing · hostile | — | `fallen` (1SA.17.49) |
 | `fallen` | hold · fallen | — | *end* |
 
