@@ -33,27 +33,22 @@ five.
 same righteousness read through 24 pairs of eyes arrives as welcome on one face,
 dread on another.
 
-**Drives and places.** Martha and Mary stand in one room, see the same
-interruption and do opposite things; neither arc mentions the other, and only the
-drives differ. A room presses on whoever is standing in it, which is how a
-frightening place stops the donkey with nothing shown to it.
-
 **Grace.** Specified in `docs/grace.md` before a line of it existed. One draw per
 episode at 0.2, so four desperate moments in five receive nothing. No game code
 can call it, no parameter shapes it, and its rate moves with nothing the player
 did.
 
-Measured rather than asserted: 509 tests, ten thousand characters in the graph,
-a thousand headless runs per room. Same cast, same seed, palace against desert:
-Martha complains every time in one and settles in the other.
+Measured rather than asserted: 509 tests, ten thousand characters in the graph, a
+thousand headless runs per room. Same cast, same seed, palace against desert:
+Martha complains every time in one and settles in the other, and neither arc
+mentions the other or the room.
 
 Both APIs are structural. Nothing in the engine stores a verse; everything holds
 a reference, and the resolver is the only door text comes through, live from the
-YouVersion Platform API in the player's language. Gloo speaks the characters' own
-words out of that structure and out of a portrait per arc — register, wound, what
-he will not do — every line of it carrying the passage it is read from. It
-arbitrates what the engine cannot classify: own rules first, the model only if
-unsure, then a structural check.
+YouVersion Platform API in the player's language. Gloo speaks out of that
+structure and out of a portrait per arc — register, wound, what he will not do —
+each line of it carrying the passage it is read from. It also arbitrates what the
+engine cannot classify: own rules first, the model only if unsure, then a check.
 
 Our hardest problems were all honesty. A character's memory was frozen at
 creation, so it reacted to a world that had moved on. And twice we caught
