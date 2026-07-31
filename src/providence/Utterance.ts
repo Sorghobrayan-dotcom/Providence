@@ -234,6 +234,47 @@ function moveInWords(move: Directive['move']): string {
   }
 }
 
+/** A run this long in common is a quotation, not a coincidence. */
+const QUOTING = 6;
+
+/** Case, accents and punctuation are not what makes two lines the same line. */
+function bare(text: string): string[] {
+  return text
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+/**
+ * Is he reciting the passage rather than speaking?
+ *
+ * The system prompt forbids it and a model obeys a prompt most of the time,
+ * which is not the standard this project holds itself to anywhere else. The
+ * failure is not hypothetical: an arc with no portrait has only one piece of
+ * character to lean on — the passage it was handed as the *reason* — and leans
+ * on it. Goliath's first line came back as very nearly 1 Samuel 17:10.
+ *
+ * That is the one thing the whole project must not be caught doing: paraphrase
+ * beside a reference reads as Scripture and is not. So the answer is checked
+ * rather than trusted, in the same spirit as `Interpreter`, and a line that
+ * recites is refused — which means silence, which is always the correct output.
+ */
+export function recites(line: string, passage: string | undefined): boolean {
+  if (!passage) return false;
+
+  const said = bare(line);
+  if (said.length < QUOTING) return false;
+
+  const source = bare(passage).join(' ');
+  for (let i = 0; i + QUOTING <= said.length; i += 1) {
+    if (source.includes(said.slice(i, i + QUOTING).join(' '))) return true;
+  }
+  return false;
+}
+
 /**
  * Clean up what came back.
  *

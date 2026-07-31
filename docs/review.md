@@ -10,7 +10,7 @@ than a day.
 | | |
 | --- | --- |
 | engine | 5,228 lines across 21 modules |
-| tests | 5,816 lines, 476 assertions in 35 files |
+| tests | 5,893 lines, 483 assertions in 35 files |
 | editor | 3,561 lines, 145 assertions in 10 files |
 | notebook | 47 cells, 25 of them executable, all passing |
 | bundle | 59 kB for the editor, 482 kB for Three.js |
@@ -26,10 +26,11 @@ ten thousand episodes, two populations differing only in merit land within 0.03,
 and a test reads the engine source files to confirm no verse text has crept in.
 Any of these breaking makes the writeup untrue, and that is the point of them.
 
-**Scripture is load-bearing rather than decorative.** Nothing in 4,841 lines
+**Scripture is load-bearing rather than decorative.** Nothing in 5,228 lines
 stores a verse. Remove the key and the characters go silent, which is asserted
 directly. The proxy means the credential never reaches the browser, and a test
-fails if a `VITE_*KEY` reappears in client code.
+fails if a `VITE_*KEY` reappears in client code. And what the model sends back is
+now checked for recitation rather than trusted not to recite.
 
 **The three pillars are one system.** They were not at first. Arcs kept a trust
 number with no connection to the graph, so you could betray a character and watch
@@ -122,10 +123,17 @@ the three from the conversation, and the two counters that survived a load.
 backlog rather than a hole. But the fallback has a failure mode worth naming:
 without a portrait the model leans on the one piece of character it was given,
 which is the passage behind the change, and paraphrases it. Goliath's first line
-was very nearly 1 Samuel 17:10 back at us. Telling the prompt that the arc's
-label is a designer's shelf-name and not his own stopped the worst of it — the
-judge had been introducing himself as *Le Juge Lasse* — but a portrait is the
-real fix and sixteen are missing.
+was very nearly 1 Samuel 17:10 back at us — printed under a reference, which
+reads as Scripture and is not. That is the one thing this project must not be
+caught doing.
+
+A line is now checked rather than trusted: six consecutive words in common with
+the passage is a quotation, and a line that recites is refused, which means
+silence. **What that does not cover** is the case that produced Goliath. The
+greeting had no passage attached to it — only the reference — and the model
+recalled the verse from its own memory, so there was nothing to compare against.
+The check protects every transition, which is where most lines come from. The
+real fix for the rest is the sixteen portraits.
 
 **Godot ships 4 arcs, not 24.** A transition holds a predicate, and a predicate
 is code rather than data, so it cannot be exported from the TypeScript and

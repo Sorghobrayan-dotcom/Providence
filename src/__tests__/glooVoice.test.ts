@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { GlooTokenSource } from '../api/glooToken';
 import { GlooVoice } from '../api/GlooVoice';
-import { promptFor, tidy, type Occasion } from '../providence/Utterance';
+import { promptFor, recites, tidy, type Occasion } from '../providence/Utterance';
 import { NO_COVENANT, covenantOf } from '../providence/covenant';
 import { UNDEFILED, shedBlood } from '../providence/standing';
 import { RelationGraph } from '../providence/relations';
@@ -249,6 +249,41 @@ describe('tidying what came back', () => {
   });
 });
 
+/**
+ * The one thing this project must not be caught doing.
+ *
+ * The prompt forbids reciting and a model obeys a prompt most of the time, which
+ * is not the standard held anywhere else here. And the failure is not
+ * hypothetical: an arc with no portrait has exactly one piece of character to
+ * lean on — the passage it was handed as the reason for the change — and leans
+ * on it. Goliath's opening came back as very nearly 1 Samuel 17:10, printed
+ * under a reference, which reads as Scripture and is not.
+ */
+describe('refusing a line that recites', () => {
+  const passage = 'Et Jonas se leva pour s\'enfuir a Tarsis, loin de la face de l\'Eternel.';
+
+  it('catches a straight lift', () => {
+    expect(recites('Je me leve pour m\'enfuir a Tarsis, loin de la face', passage)).toBe(true);
+  });
+
+  it('is not fooled by case, accents or punctuation', () => {
+    expect(recites('JONAS SE LEVA — POUR S\'ENFUIR À TARSIS, LOIN DE LA FACE...', passage)).toBe(true);
+  });
+
+  it('lets him talk about the same thing in his own words', () => {
+    expect(recites('Je pars. Ne me demande pas où.', passage)).toBe(false);
+    expect(recites('Tarsis. Voilà où je vais, et tu ne me suivras pas.', passage)).toBe(false);
+  });
+
+  it('does not trip on a short line that could not be a quotation', () => {
+    expect(recites('loin de la face', passage)).toBe(false);
+  });
+
+  it('has nothing to compare against when no passage was served', () => {
+    expect(recites('Et Jonas se leva pour s\'enfuir a Tarsis, loin de la face', undefined)).toBe(false);
+  });
+});
+
 describe('the voice', () => {
   const answering = (content: string, status = 200) =>
     vi.fn(async () => new Response(
@@ -280,6 +315,24 @@ describe('the voice', () => {
     const body = JSON.parse(String(init.body)) as Record<string, unknown>;
     const routing = ['auto_routing', 'model', 'model_family'].filter((k) => k in body);
     expect(routing).toEqual(['auto_routing']);
+  });
+
+  it('swallows a line that recites the passage it was given as a reason', async () => {
+    const served = 'Et Jonas se leva pour s\'enfuir a Tarsis, loin de la face de l\'Eternel.';
+    const voice = new GlooVoice(
+      '/gloo/x',
+      answering('Je me leve pour m\'enfuir a Tarsis, loin de la face.') as unknown as typeof fetch,
+    );
+
+    expect(await voice.speak(occasion({ passage: served }))).toBeNull();
+    expect(voice.outcome).toBe('recited');
+  });
+
+  it('keeps his own words when the passage was served alongside them', async () => {
+    const voice = new GlooVoice('/gloo/x', answering('Ne me demande pas ça.') as unknown as typeof fetch);
+    expect(await voice.speak(occasion({ passage: 'Et Jonas se leva pour s\'enfuir a Tarsis.' })))
+      .toBe('Ne me demande pas ça.');
+    expect(voice.outcome).toBe('spoke');
   });
 
   it('stays silent rather than inventing when Gloo is unreachable', async () => {

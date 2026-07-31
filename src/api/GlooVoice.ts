@@ -1,4 +1,4 @@
-import { promptFor, tidy, type Occasion } from '../providence/Utterance';
+import { promptFor, recites, tidy, type Occasion } from '../providence/Utterance';
 
 /**
  * The browser half of the voice.
@@ -31,7 +31,7 @@ export class GlooVoice {
   private readonly fetchImpl: typeof globalThis.fetch;
 
   /** Set when Gloo has answered at least once, so the editor can report it. */
-  private lastOutcome: 'idle' | 'spoke' | 'silent' | 'unconfigured' = 'idle';
+  private lastOutcome: 'idle' | 'spoke' | 'silent' | 'recited' | 'unconfigured' = 'idle';
 
   constructor(endpoint = ENDPOINT, fetchImpl: typeof globalThis.fetch = globalThis.fetch) {
     this.endpoint = endpoint;
@@ -73,6 +73,17 @@ export class GlooVoice {
 
       const body = (await response.json()) as Completion;
       const line = tidy(body.choices?.[0]?.message?.content ?? '');
+
+      /* Checked rather than trusted. The prompt forbids reciting and a model
+         obeys a prompt most of the time, which is not the standard held
+         anywhere else here — and paraphrase printed beside a reference reads as
+         Scripture and is not. A line that recites is refused, which means the
+         character says nothing, which is always the correct output. */
+      if (line !== null && recites(line, occasion.passage)) {
+        this.lastOutcome = 'recited';
+        return null;
+      }
+
       this.lastOutcome = line ? 'spoke' : 'silent';
       return line;
     } catch {
