@@ -176,9 +176,42 @@ describe('the character speaks', () => {
       expect(tails).toBe(1);
     });
 
-    it('still carries the reference, so the claim can be checked', () => {
+    it('carries no reference either, because it is not a citation', () => {
       narrate('Il ne bouge pas.');
-      expect(cite()).toEqual(['JON.1.3']);
+      expect(cite()).toEqual([]);
+    });
+  });
+
+  /**
+   * Only Scripture is cited.
+   *
+   * A reference under a character's own words is the exact failure this project
+   * names in its own writeup — a paraphrase set beside a reference reads as the
+   * verse. And it is not hypothetical: asked to open, Elijah produced a
+   * recognisable reformulation of 1 Kings 18:21, which under `1KI.18.21` would
+   * have been indistinguishable from the passage itself. The console keeps the
+   * reference on the telemetry channel, where it is labelled as telemetry.
+   */
+  describe('what may carry a reference', () => {
+    const plate = (voicing: 'utterance' | 'scripture' | 'narration') => {
+      drawn.length = 0;
+      speech = new Speech();
+      speech.say('Jusqu\'à quand allez-vous hésiter entre deux camps ?', '1KI.18.21', voicing);
+    };
+
+    it('cites the passage when the passage is what is being shown', () => {
+      plate('scripture');
+      expect(cite()).toEqual(['1KI.18.21']);
+    });
+
+    it('does not cite a character speaking for himself', () => {
+      plate('utterance');
+      expect(cite()).toEqual([]);
+    });
+
+    it('shows the words either way, so nothing is lost by not citing', () => {
+      plate('utterance');
+      expect(drawn.some((d) => d.text.includes('hésiter'))).toBe(true);
     });
   });
 

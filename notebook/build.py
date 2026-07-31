@@ -581,6 +581,16 @@ print("actor ready")
 ''')
 
 code('''
+# Being sold. Written once and hung on all three nodes where he is at your side.
+# The guard mirrors the way back out, so the two are exact complements: pay the
+# price and he returns and stays; betray him again and the price moves.
+OFFENCE = {
+    "to": "offended",
+    "when": lambda c: c["memory"].betrayals > 0
+    and c["w"]["kindnesses_witnessed"] < 4 * c["memory"].betrayals,
+    "because": "PSA.41.9",
+}
+
 # Peter. Luke 22, John 21. Loyalty that breaks under pressure and can be repaired.
 PETER = {
     "id": "peter",
@@ -588,10 +598,20 @@ PETER = {
     "start": {"trust": 0.85, "fear": 0.1, "resolve": 0.9},
     "nodes": {
         "following": {"transitions": [
+            OFFENCE,
             {"to": "pressed", "when": lambda c: c["w"]["under_threat"],
              "because": "LUK.22.54"},
         ]},
+        # sold, and gone. Not the denial: nothing frightened him and there are
+        # no tears in it. Winnable, and dear: a brother offended is harder to be
+        # won than a strong city.
+        "offended": {"drift": {"trust": -0.05}, "transitions": [
+            {"to": "following",
+             "when": lambda c: c["w"]["kindnesses_witnessed"] >= 4 * c["memory"].betrayals,
+             "because": "PRO.18.19"},
+        ]},
         "pressed": {"drift": {"fear": 0.09, "trust": -0.02}, "transitions": [
+            OFFENCE,
             # it took a great deal to break him the first time; it takes less
             # afterwards, which is what a scar is
             {"to": "denying",
@@ -612,6 +632,7 @@ PETER = {
              "because": "JHN.21.17"},
         ]},
         "restored": {"drift": {"trust": 0.04}, "transitions": [
+            OFFENCE,
             # restoration is not immunity
             {"to": "pressed", "when": lambda c: c["w"]["under_threat"],
              "because": "LUK.22.54"},
@@ -638,21 +659,32 @@ run(trusted, "weeping", {})
 run(trusted, "restored", {"kindnesses_witnessed": 3})
 print("clean slate, three kindnesses ->", trusted.state)
 
-# a record with a betrayal in it: three is no longer enough
+# now sell him. No threat anywhere: he simply goes.
 scarred = RelationGraph()
 scarred.bind("peter", "player", "covenant", 0.9)
 scarred.commit("betray", "player", "peter")
 wary = Actor(PETER, Memory(scarred, "peter"))
-run(wary, "denying", {"under_threat": True})
-run(wary, "weeping", {})
-for _ in range(60):
+run(wary, "offended", {})
+print("sold, with nothing frightening him ->", wary.state)
+
+for _ in range(40):
     wary.update(1, dict(BLANK_WORLD, kindnesses_witnessed=3))
-print("one betrayal on record, three kindnesses ->", wary.state, "(sixty seconds of it)")
+print("   the three that mend a denial ->", wary.state, "(forty seconds of them)")
+run(wary, "following", {"kindnesses_witnessed": 4})
+print("                          four ->", wary.state)
+
+# and the betrayal is still in the ledger, so his own denial costs more to mend
+run(wary, "denying", {"under_threat": True, "kindnesses_witnessed": 4})
+run(wary, "weeping", {"kindnesses_witnessed": 4})
+for _ in range(40):
+    wary.update(1, dict(BLANK_WORLD, kindnesses_witnessed=4))
+print("broken again, four kindnesses ->", wary.state, "(forty seconds of them)")
 run(wary, "restored", {"kindnesses_witnessed": 5})
-print("                        five kindnesses ->", wary.state)
+print("                        five ->", wary.state)
 
 assert trusted.state == "restored" and wary.state == "restored"
 print("\\nA man who has been sold once does not come back on the same terms.")
+print("He does not stay, either. Nothing in the arc names betrayal: it reads the graph.")
 ''')
 
 md("""
@@ -1361,7 +1393,7 @@ md("""
 | | a blessing moves and never duplicates | one in the world after any number of thefts |
 | | rescue costs the rescuer, and only a kinsman may | the closest friend refused |
 | | forgiveness cancels the claim, keeps the record | ledger intact after pardon |
-| Souls | coming back costs more once you have sold him | 3 kindnesses clean, 5 with a betrayal on record |
+| Souls | selling a man ends his company, and mending costs more after | he leaves; 4 kindnesses back, then 5 to mend the denial |
 | | a wound reopens faster than it first opened | second break strictly sooner |
 | Drives | same room, opposite behaviour | Martha tidies, Mary listens, from drives alone |
 | Grace | four desperate moments in five receive nothing | 10,000 episodes, rate near 0.2 |
@@ -1375,7 +1407,7 @@ md("""
 
 ## Where the real engine lives
 
-This notebook is a faithful port of the laws. The engine itself is TypeScript, with 362
+This notebook is a faithful port of the laws. The engine itself is TypeScript, with 509
 tests, a Godot addon, and an editor whose viewport is a real 3D scene rather than a
 diagram. The repository link is in the writeup.
 

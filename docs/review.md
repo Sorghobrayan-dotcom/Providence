@@ -9,9 +9,9 @@ than a day.
 
 | | |
 | --- | --- |
-| engine | 5,228 lines across 21 modules |
-| tests | 5,893 lines, 483 assertions in 35 files |
-| editor | 3,561 lines, 145 assertions in 10 files |
+| engine | 5,540 lines across 21 modules |
+| tests | 6,144 lines, 509 assertions in 36 files |
+| editor | 3,578 lines, 170 assertions in 11 files |
 | notebook | 47 cells, 25 of them executable, all passing |
 | bundle | 59 kB for the editor, 482 kB for Three.js |
 
@@ -26,7 +26,7 @@ ten thousand episodes, two populations differing only in merit land within 0.03,
 and a test reads the engine source files to confirm no verse text has crept in.
 Any of these breaking makes the writeup untrue, and that is the point of them.
 
-**Scripture is load-bearing rather than decorative.** Nothing in 5,228 lines
+**Scripture is load-bearing rather than decorative.** Nothing in 5,540 lines
 stores a verse. Remove the key and the characters go silent, which is asserted
 directly. The proxy means the credential never reaches the browser, and a test
 fails if a `VITE_*KEY` reappears in client code. And what the model sends back is
@@ -68,13 +68,17 @@ kindness shown to somebody else.
 **They no longer all speak in the same voice.** The prompt carried the structure
 and nothing else — which node, how afraid, what the player's record says — which
 is enough for a plausible line and nowhere near enough for a particular man's.
-Eight portraits now go with it: register, wound, desire, what he will not do
-whatever happens, and how he reads the same public record. Every claim carries
-the passage it is read from and a test insists on it, because a portrait is a
-reading rather than characterisation we invented. Asked the same question, the
-fugitive answers `Tu voulais quoi, toi, en fuyant ?` and the judge answers
-`Encore toi ? Le juge ne change pas d'avis parce qu'on frappe deux fois à sa
-porte`.
+All twenty four now carry a portrait: register, wound, desire, what he will not
+do whatever happens, and how he reads the same public record. Every claim carries
+the passage it is read from and a test insists on it, because a portrait has to
+be a reading rather than characterisation we invented.
+
+Asked to open, through the live API: Martha says `Va chercher l'eau` and Mary
+says `Je reste ici`. Jezebel offers `je peux rédiger ce qu'il faut pour que
+d'autres agissent à votre place`. The centurion: `Un ordre de vous suffirait, je
+n'ai pas besoin que vous veniez`. Goliath does not address you at all — `Alors,
+Israël, vous m'envoyez enfin quelqu'un` — which is the arc's whole claim, made
+in his own words rather than in ours.
 
 **The instrument explains itself now.** The cue always said what the character
 was doing and nothing said what the room around him was: why two controls are
@@ -107,9 +111,9 @@ it was wrong. The default is now to compare and fail with the command to run;
 
 **`main.ts` and `Stage3D.ts` still have no tests.** This was the worst thing on
 the list and most of it is now closed: `Bearing`, `Speech`, the console, the
-logo, the cues, the relation panel, the encounter, the verbs, the tour, the
-controls and the movement carry 145 assertions between them. Every extraction
-was made because the code being pulled out had already been wrong once.
+logo, the cues, the panels, the encounter, the verbs, the tour, the controls and
+the movement carry 170 assertions between them. Every extraction was made
+because the code being pulled out had already been wrong once.
 
 What is left is the 1,352 lines of `main.ts` and the viewport, and it is now
 genuinely wiring: which element to write into, which listener to hang, what to
@@ -118,22 +122,20 @@ in the repository and still where every remaining bug has been found — the boo
 path that set the first arc up by hand, the cast that left it out of the graph,
 the three from the conversation, and the two counters that survived a load.
 
-**Sixteen of the twenty four have no portrait.** They are listed by hand in
-`PENDING` and the suite fails if an arc is neither written nor listed, so it is a
-backlog rather than a hole. But the fallback has a failure mode worth naming:
-without a portrait the model leans on the one piece of character it was given,
-which is the passage behind the change, and paraphrases it. Goliath's first line
-was very nearly 1 Samuel 17:10 back at us — printed under a reference, which
-reads as Scripture and is not. That is the one thing this project must not be
-caught doing.
+**A generated line can still resemble the verse behind it, and that is now
+harmless rather than fixed.** The check catches recitation of a passage we
+supplied — six consecutive words in common is a quotation — which covers every
+transition. It cannot catch a model recalling a verse from a bare reference, and
+that happened twice: Goliath's opening was very nearly 1 Samuel 17:10, and
+Elijah's a recognisable reformulation of 1 Kings 18:21.
 
-A line is now checked rather than trusted: six consecutive words in common with
-the passage is a quotation, and a line that recites is refused, which means
-silence. **What that does not cover** is the case that produced Goliath. The
-greeting had no passage attached to it — only the reference — and the model
-recalled the verse from its own memory, so there was nothing to compare against.
-The check protects every transition, which is where most lines come from. The
-real fix for the rest is the sixteen portraits.
+Portraits fixed Goliath, because a character with somewhere else to draw from
+draws from there. Elijah is the harder case and probably not fixable by
+prompting: the thing he is famous for saying is the thing the scene calls for.
+What made it dangerous was not the resemblance but the citation — the plate
+printed `1KI.18.21` under his own words, which is precisely the failure this
+project names in its own writeup. Only Scripture is cited now. His words stand
+without a reference and the console keeps it, labelled as telemetry.
 
 **Godot ships 4 arcs, not 24.** A transition holds a predicate, and a predicate
 is code rather than data, so it cannot be exported from the TypeScript and
@@ -160,22 +162,23 @@ pointing somewhere else is a cost paid by every reader.
 
 ## Proposals, ranked by value for the effort
 
-**1. Cover the panels.** The relation panel has its cast tested and the graph
-layout, the deed buttons and the place notes do not. It is the last real
-arithmetic left in the editor with nothing under it.
-
-**2. Open Godot once and run the addon.** An hour, and it converts a plausible
+**1. Open Godot once and run the addon.** An hour, and it converts a plausible
 claim into a true one. Until that happens the honest phrasing in the writeup is
-"a GDScript port" rather than anything stronger.
+"a GDScript port" rather than anything stronger. It is now the only claim in the
+repository that nothing has ever executed.
 
-**3. Lazy-load the viewport.** The editor is usable without Three.js: the
+**2. Lazy-load the viewport.** The editor is usable without Three.js: the
 library, the graph, the places and grace all work in the panels. Load the 3D
 scene on demand and the first paint drops from 541 kB to 59. This matters most for
 the audience the project keeps invoking.
 
-**4. Write the sixteen remaining portraits.** Not for completeness: an arc
-without one leans on the passage it was handed and paraphrases it, which is the
-one thing this project must not be caught doing.
+**3. Bound the traversal in `house()`.** A depth limit with a decay per hop, so
+bloodguilt reaching a grandchild costs less than reaching a son. Small change,
+and it makes the propagation claim considerably stronger.
+
+**4. Compact cancelled holdings.** A periodic sweep, or a generational split
+between live and settled. Only matters for a long-lived world, which is why it is
+this far down.
 
 **5. Bound the traversal in `house()`.** A depth limit with a decay per hop, so
 bloodguilt reaching a grandchild costs less than reaching a son. Small change,

@@ -183,13 +183,14 @@ export class Speech {
 
     const lines = this.wrap(text, face);
     const bodyHeight = lines.length * BODY_LEAD;
-    const plateHeight = bodyHeight + CITE_SIZE + PAD * 2 + 14;
+    const plateHeight = bodyHeight + (voicing === 'scripture' ? CITE_SIZE : 0) + PAD * 2 + 14;
     const tail = 18;
 
     // widest line decides the plate, so a short line gets a short plate
     ctx.font = face;
     const widest = lines.reduce((w, l) => Math.max(w, ctx.measureText(l).width), 0);
-    const plateWidth = Math.min(WIDTH - PAD, Math.max(widest, ctx.measureText(reference).width) + PAD * 2);
+    const cited = voicing === 'scripture' ? ctx.measureText(reference).width : 0;
+    const plateWidth = Math.min(WIDTH - PAD, Math.max(widest, cited) + PAD * 2);
 
     const left = (WIDTH - plateWidth) / 2;
     const bottom = HEIGHT - tail;
@@ -223,9 +224,20 @@ export class Speech {
       ctx.fillText(line, WIDTH / 2, top + PAD + BODY_SIZE + i * BODY_LEAD);
     });
 
-    ctx.font = MONO;
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.fillText(reference.toUpperCase(), WIDTH / 2, top + PAD + bodyHeight + CITE_SIZE + 6);
+    /* Only Scripture is cited.
+     *
+     * A reference under a character's own words is the whole failure this
+     * project names in its own writeup: a paraphrase set beside a reference
+     * reads as the verse, and a generated line under `1KI.18.21` is exactly
+     * that whatever the prompt told the model. His words are his; the passage
+     * they came out of is in the console, on the telemetry channel, labelled.
+     * Nothing is lost and the ambiguity is gone.
+     */
+    if (voicing === 'scripture') {
+      ctx.font = MONO;
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.fillText(reference.toUpperCase(), WIDTH / 2, top + PAD + bodyHeight + CITE_SIZE + 6);
+    }
 
     this.texture.needsUpdate = true;
   }

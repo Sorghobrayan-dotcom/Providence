@@ -27,8 +27,13 @@ import { ATMOSPHERES, type Atmosphere } from '../providence/atmosphere';
 const HOUSEHOLD = 'his-brother';
 const BYSTANDER = 'boaz';
 
-/** Ring layout, so the graph reads the same on every redraw. */
-function ringPositions(count: number, width: number, height: number): { x: number; y: number }[] {
+/**
+ * Ring layout, so the graph reads the same on every redraw.
+ *
+ * Exported for the tests: a layout that quietly drifts, overlaps or leaves the
+ * box is the kind of thing that looks like a rendering glitch for weeks.
+ */
+export function ringPositions(count: number, width: number, height: number): { x: number; y: number }[] {
   const cx = width / 2;
   const cy = height / 2;
   const r = Math.min(width, height) * 0.34;

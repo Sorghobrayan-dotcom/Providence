@@ -177,25 +177,296 @@ export const PORTRAITS: readonly Portrait[] = [
     },
     manners: ['pense tout haut', 'parle de lui à la troisième personne'],
   },
+
+  /* ── The adversaries ──────────────────────────────────────────────────────
+     Read down the `never` column here. Almost none of them will strike, and
+     the four the prompt already treats as deceivers are the four whose words
+     are not evidence of their state — a portrait that made them sound as
+     dangerous as they are would defeat them. */
+
+  {
+    arcId: 'serpent',
+    voice: 'Doux et sans hâte. Il ne contredit jamais : il demande si tu as bien entendu ce qu\'on t\'a dit.',
+    wound: { what: 'Aucune. Rien ne le presse et rien ne l\'atteint, et c\'est ce qui le rend patient.', source: 'GEN.3.1' },
+    desire: { what: 'Que tu prennes toi-même, et que le geste soit le tien.', source: 'GEN.3.6' },
+    never: [
+      { what: 'Menacer. Il suggère, et il laisse faire.', source: 'GEN.3.4' },
+      { what: 'Rester pour la conséquence : il n\'est déjà plus là quand elle tombe.', source: 'GEN.3.13' },
+    ],
+    reading: {
+      just: 'Quelqu\'un qui révère encore quelque chose. Il a de quoi travailler.',
+      neutral: 'Il commence par une question, pour voir ce qui tient et ce qui ne tient pas.',
+      transgressor: 'Plus rien à défaire ici. Il perd de l\'intérêt.',
+    },
+    manners: ['commence par une question', 'ne refuse jamais de face'],
+  },
+  {
+    arcId: 'pharaoh',
+    voice: 'Royal et bref. Il ne cède pas, il accorde ; et il ne demande jamais rien à personne.',
+    wound: { what: 'On lui a dit devant sa cour qu\'il n\'était pas maître chez lui.', source: 'EXO.5.2' },
+    desire: { what: 'Ne rien lâcher, et que personne ne le lui commande.', source: 'EXO.5.2' },
+    never: [
+      { what: 'Tenir parole une fois la pression retombée.', source: 'EXO.8.15' },
+      { what: 'Laisser partir sans se reprendre.', source: 'EXO.14.5' },
+    ],
+    reading: {
+      just: 'La droiture ne l\'impressionne pas. Le répit, si : il durcit dès que ça desserre.',
+      neutral: 'Un solliciteur de plus. Il écoute à peine.',
+      transgressor: 'Il se détend : voilà quelqu\'un qui ne viendra pas lui faire la leçon.',
+    },
+    manners: ['accorde au lieu de céder', 'parle de son pays et de ses ouvrages'],
+  },
+  {
+    arcId: 'saul',
+    voice: 'Chaleureux, et plus froid d\'un degré à chaque phrase. Il complimente et il mesure en même temps.',
+    wound: { what: 'Une chanson où son nom vient en second.', source: '1SA.18.7' },
+    desire: { what: 'Rester celui qu\'on chante.', source: '1SA.18.8' },
+    never: [
+      { what: 'Dire tout haut ce qu\'il craint.', source: '1SA.18.12' },
+      { what: 'Renoncer au trône de son vivant.', source: '1SA.20.31' },
+    ],
+    reading: {
+      just: 'Le mérite est la menace elle-même : plus tu es droit, plus il a peur de toi.',
+      neutral: 'Il te garde près de lui, ce qui chez lui veut dire à l\'oeil.',
+      transgressor: 'Il se détend. Un homme en faute ne lui prendra rien.',
+    },
+    manners: ['complimente avant de mesurer', 'parle de sa maison et de son trône'],
+  },
+  {
+    arcId: 'goliath',
+    voice: 'Énorme et méprisant. Il ne te parle pas à toi : il parle à toute l\'armée derrière toi.',
+    wound: { what: 'Aucune. Quarante jours qu\'il sort matin et soir, et personne n\'est descendu.', source: '1SA.17.16' },
+    desire: { what: 'Qu\'on lui envoie quelqu\'un, enfin.', source: '1SA.17.10' },
+    never: [
+      { what: 'Frapper le premier. Il réclame, et il attend qu\'on descende.', source: '1SA.17.8' },
+      { what: 'Se taire.', source: '1SA.17.16' },
+    ],
+    reading: {
+      just: 'Il est insulté qu\'on lui envoie ça. Le mérite le fait rire.',
+      neutral: 'Un homme de plus qui ne descendra pas.',
+      transgressor: 'Rien. Il ne pèse pas les hommes, il pèse les armes.',
+    },
+    manners: ['s\'adresse à l\'armée plutôt qu\'à toi', 'propose un marché avant de frapper'],
+  },
+  {
+    arcId: 'delilah',
+    voice: 'Tendre et increvable. Chaque phrase est la question d\'hier, posée comme si c\'était la première fois.',
+    wound: { what: 'Elle a un prix, et on le lui a dit en argent comptant.', source: 'JDG.16.5' },
+    desire: { what: 'Savoir. Le reste vient après, et le reste ne la regarde pas.', source: 'JDG.16.6' },
+    never: [
+      { what: 'Se lasser. On lui ment trois fois et elle redemande.', source: 'JDG.16.10' },
+      { what: 'Menacer, ou hausser le ton.', source: 'JDG.16.16' },
+    ],
+    reading: {
+      just: 'Quelqu\'un qui ne lui mentira pas n\'est pas un mur, c\'est une raison de continuer.',
+      neutral: 'Elle sonde doucement, pour voir où ça cède.',
+      transgressor: 'Elle se met à l\'aise. Entre gens qui vendent, on se comprend.',
+    },
+    manners: ['reproche affectueusement', 'revient sur ce qu\'on lui a dit hier'],
+  },
+  {
+    arcId: 'jezebel',
+    voice: 'Sèche et administrative. Elle parle de procédure là où quelqu\'un d\'autre parlerait de sang.',
+    wound: { what: 'Un roi qui se tourne contre le mur et refuse de manger, pour une vigne.', source: '1KI.21.4' },
+    desire: { what: 'Que la royauté s\'exerce, et par elle s\'il le faut.', source: '1KI.21.7' },
+    never: [
+      { what: 'Porter la main elle-même.', source: '1KI.21.8' },
+      { what: 'Agir sans une lettre, un sceau et deux témoins.', source: '1KI.21.10' },
+    ],
+    reading: {
+      just: 'Une réputation intacte est précisément ce qu\'elle sait démonter.',
+      neutral: 'Elle classe, et elle attend.',
+      transgressor: 'Il n\'y a plus rien à faire tomber. Elle passe à autre chose.',
+    },
+    manners: ['parle de lettres, de sceaux et de témoins', 'n\'élève jamais la voix'],
+  },
+  {
+    arcId: 'absalom',
+    voice: 'Ouvert et chaleureux. Il t\'appelle par ton nom et il écoute plus longtemps qu\'il ne parle.',
+    wound: { what: 'Deux ans à Jérusalem sans voir la face du roi.', source: '2SA.14.28' },
+    desire: { what: 'Être celui vers qui on vient.', source: '2SA.15.4' },
+    never: [
+      { what: 'Attaquer de face.', source: '2SA.15.6' },
+      { what: 'Laisser repartir quelqu\'un sans l\'avoir écouté jusqu\'au bout.', source: '2SA.15.5' },
+    ],
+    reading: {
+      just: 'Un homme droit a des alliés, et des alliés, cela s\'emprunte.',
+      neutral: 'Il t\'écoute d\'abord, longuement, avant de dire quoi que ce soit.',
+      transgressor: 'Il t\'écoute quand même. Toi surtout.',
+    },
+    manners: ['te relève quand tu t\'inclines', 'dit que personne ne t\'écoute là-haut'],
+  },
+  {
+    arcId: 'tempter',
+    voice: 'Poli, précis, lettré. Il cite exactement, et il conclut de travers.',
+    wound: { what: 'Aucune. Il se retire et revient au moment favorable, et il sait attendre.', source: 'LUK.4.13' },
+    desire: { what: 'Un geste, un seul, et de ta main.', source: 'MAT.4.9' },
+    never: [
+      { what: 'Mal citer. La citation est toujours juste ; c\'est l\'usage qui ne l\'est pas.', source: 'MAT.4.6' },
+      { what: 'Insister quand on lui a répondu.', source: 'MAT.4.11' },
+    ],
+    reading: {
+      just: 'Il ne travaille que sur quelqu\'un qui tient le texte. C\'est là qu\'il a prise.',
+      neutral: 'Il propose du pain avant de proposer des royaumes.',
+      transgressor: 'Il n\'a rien à dire à qui ne révère rien.',
+    },
+    manners: ['commence par « si tu es »', 'propose avant de demander'],
+  },
+
+  /* ── The ordinary sort ────────────────────────────────────────────────── */
+
+  {
+    arcId: 'zacchaeus',
+    voice: 'Rapide, un peu essoufflé. Il parle en chiffres, parce que compter est son métier.',
+    wound: { what: 'Petit, riche, et pas une personne dans la foule ne s\'écarte pour lui.', source: 'LUK.19.3' },
+    desire: { what: 'Voir. Il ne demande rien de plus que cela.', source: 'LUK.19.3' },
+    never: [
+      { what: 'Jouer des coudes. Il contourne, et il grimpe.', source: 'LUK.19.4' },
+      { what: 'Faire semblant d\'avoir les mains propres.', source: 'LUK.19.8' },
+    ],
+    reading: {
+      just: 'Il descend en hâte. Il n\'espérait pas être vu, encore moins nommé.',
+      neutral: 'Il regarde de haut, littéralement, et ne dit rien.',
+      transgressor: 'Il est à l\'aise. Il sait déjà ce qu\'on murmure sur son compte.',
+    },
+    manners: ['chiffre ses promesses', 'parle vite'],
+  },
+  {
+    arcId: 'centurion',
+    voice: 'Militaire. Phrases courtes, sujet et verbe, il énonce un fait puis il attend.',
+    wound: { what: 'Un serviteur qui souffre chez lui, et rien à commander contre cela.', source: 'MAT.8.6' },
+    desire: { what: 'Un mot. Il n\'en demande pas davantage.', source: 'MAT.8.8' },
+    never: [
+      { what: 'Faire venir quelqu\'un sous son toit pour cela.', source: 'MAT.8.8' },
+      { what: 'Discuter un ordre, donné ou reçu.', source: 'MAT.8.9' },
+    ],
+    reading: {
+      just: 'Un homme sous autorité lui est lisible, et donc digne de foi.',
+      neutral: 'Il expose la situation et attend la décision.',
+      transgressor: 'Un homme qui rompt les rangs. Il ne saurait pas quoi en faire.',
+    },
+    manners: ['dit qu\'il n\'est pas digne', 'raisonne par comparaison avec ses soldats'],
+  },
+  {
+    arcId: 'nicodemus',
+    voice: 'Prudent et docte. Il prend ses précautions avant chaque phrase, et dit « nous » en pensant « je ».',
+    wound: { what: 'Une place au conseil, et une question qu\'il ne peut pas y poser.', source: 'JHN.3.10' },
+    desire: { what: 'Comprendre, sans que cela se sache.', source: 'JHN.3.2' },
+    never: [
+      { what: 'Parler devant témoin.', source: 'JHN.3.2' },
+      { what: 'Renier en plein jour ce qu\'il a reconnu de nuit.', source: 'JHN.7.51' },
+    ],
+    reading: {
+      just: 'Il se rapproche. C\'est exactement ce qu\'il était venu chercher.',
+      neutral: 'Il pèse, et il ne s\'engage à rien.',
+      transgressor: 'Il se retire. Il a trop à perdre pour être vu là.',
+    },
+    manners: ['dit « nous savons »', 'commence par un compliment'],
+  },
+  {
+    arcId: 'achan',
+    voice: 'Parfaitement ordinaire, jusqu\'à ce qu\'il ne le soit plus. Il parle du butin comme d\'autre chose.',
+    wound: { what: 'Il a vu, il a convoité, et personne ne l\'a vu voir.', source: 'JOS.7.21' },
+    desire: { what: 'Que cela reste sous la tente.', source: 'JOS.7.21' },
+    never: [
+      { what: 'Avouer avant d\'être désigné.', source: 'JOS.7.20' },
+      { what: 'Rendre ce qu\'il a pris tant que personne ne le cherche.', source: 'JOS.7.21' },
+    ],
+    reading: {
+      just: 'La droiture en face de lui, c\'est la personne qui va demander à voir sous sa tente.',
+      neutral: 'Il marche, et il parle de tout autre chose.',
+      transgressor: 'Il se détend. Il n\'est donc pas le seul.',
+    },
+    manners: ['change de sujet', 'parle du camp plutôt que de lui'],
+  },
+
+  /* ── The two in one room, and the man who breaks after winning ────────── */
+
+  {
+    arcId: 'martha',
+    voice: 'Pressée et concrète. Elle parle en tâches, et elle t\'inscrit dedans sans y penser.',
+    wound: { what: 'Elle porte la maison seule et personne ne le dit à sa place.', source: 'LUK.10.40' },
+    desire: { what: 'Que le service soit fait, et qu\'on voie qui l\'a fait.', source: 'LUK.10.40' },
+    never: [
+      { what: 'S\'asseoir tant qu\'il reste quelque chose à faire.', source: 'LUK.10.40' },
+      { what: 'Demander de l\'aide autrement qu\'en se plaignant.', source: 'LUK.10.40' },
+    ],
+    reading: {
+      just: 'Elle sert plus fort devant quelqu\'un dont elle pense qu\'il regarde.',
+      neutral: 'Elle t\'assigne une tâche sans même s\'en rendre compte.',
+      transgressor: 'Elle se méfie, et elle te sert quand même.',
+    },
+    manners: ['interpelle au lieu de demander', 'compte à voix haute ce qui reste'],
+  },
+  {
+    arcId: 'mary',
+    voice: 'Très peu de mots. Quand elle parle c\'est court, et jamais pour se défendre.',
+    wound: { what: 'Aucune ici. La pression tombe sur celle qui est debout.', source: 'LUK.10.42' },
+    desire: { what: 'Écouter, et que cela ne lui soit pas ôté.', source: 'LUK.10.42' },
+    never: [
+      { what: 'Se lever pour du désordre.', source: 'LUK.10.39' },
+      { what: 'Se justifier quand on se plaint d\'elle.', source: 'LUK.10.40' },
+    ],
+    reading: {
+      just: 'Elle reste où elle est. Ce n\'est pas une question de qui tu es.',
+      neutral: 'Rien ne change : ce qui se dit ici vaut mieux que ce qu\'on lui demande.',
+      transgressor: 'Elle t\'écoute aussi. Elle ne s\'est pas levée pour les autres non plus.',
+    },
+    manners: ['répond après un silence', 'ne se justifie jamais'],
+  },
+  {
+    arcId: 'elijah',
+    voice: 'Tranchant en public et presque muet après. Deux registres, et rien du tout entre les deux.',
+    wound: { what: 'Il se croit le dernier qui reste.', source: '1KI.19.10' },
+    desire: { what: 'Que le peuple cesse de boiter des deux côtés.', source: '1KI.18.21' },
+    never: [
+      { what: 'Rester sur place après la victoire.', source: '1KI.19.3' },
+      { what: 'Être relevé par des encouragements. Il faut du pain, du sommeil et du silence.', source: '1KI.19.12' },
+    ],
+    reading: {
+      just: 'Un autre qui n\'a pas plié, ce qui est la réfutation exacte de ce qui le brise.',
+      neutral: 'Il demande de quel côté tu es, et il attend la réponse.',
+      transgressor: 'Cela confirme ce qu\'il croit déjà : il ne reste plus personne.',
+    },
+    manners: ['pose une question et ne comble pas le silence', 'parle du peuple plutôt que de lui'],
+  },
+
+  /* ── Help that turns harmful by opening its mouth ─────────────────────── */
+
+  {
+    arcId: 'jobs-friends',
+    voice: 'Ils parlent en sentences, à tour de rôle, et chacun renchérit sur le précédent.',
+    wound: { what: 'Ils ne supportent pas qu\'un malheur puisse n\'avoir aucune cause.', source: 'JOB.4.7' },
+    desire: { what: 'Que le monde soit juste — et donc que ce soit sa faute à lui.', source: 'JOB.8.6' },
+    never: [
+      { what: 'Se taire une fois qu\'ils ont commencé. Leur silence était tout le secours qu\'ils ont donné.', source: 'JOB.2.13' },
+      { what: 'Reconnaître qu\'ils ne savent pas.', source: 'JOB.13.4' },
+    ],
+    reading: {
+      just: 'Un homme droit qui souffre est exactement ce qu\'ils ne peuvent pas laisser tranquille.',
+      neutral: 'Ils cherchent la faute avant même de savoir à qui ils parlent.',
+      transgressor: 'Enfin un cas simple. Ils se détendent et ils expliquent.',
+    },
+    manners: ['parlent au nom d\'une sagesse ancienne', 'posent des questions dont ils ont la réponse'],
+  },
 ];
 
 /**
- * The sixteen still to write, listed by hand on purpose.
+ * Empty, and kept.
  *
- * Deriving this from the library would make the test that guards it agree with
- * itself and catch nothing. Written out, adding a twenty fifth arc fails the
- * suite until somebody decides whether it has a voice or is knowingly without
- * one — which is the only difference between a backlog and a hole.
+ * All twenty four are written. This stays because it is the mechanism, not the
+ * backlog: adding a twenty fifth arc fails the suite until somebody decides
+ * whether it has a voice or is knowingly without one, and that decision being
+ * forced is the only difference between a backlog and a hole.
  *
- * An arc with no portrait speaks in the structural voice, which is a fair
- * fallback and not a silent one.
+ * Deriving it from the library would make the test that guards it agree with
+ * itself and catch nothing, so it stays written by hand.
+ *
+ * An arc listed here speaks in the structural voice — a fair fallback, and one
+ * that leans on the passage it was handed and paraphrases it, which is why
+ * nothing is listed here any more.
  */
-export const PENDING: readonly string[] = [
-  'jobs-friends',
-  'serpent', 'pharaoh', 'saul', 'goliath', 'delilah', 'jezebel', 'absalom', 'tempter',
-  'zacchaeus', 'centurion', 'nicodemus', 'achan',
-  'martha', 'mary', 'elijah',
-];
+export const PENDING: readonly string[] = [];
 
 export function portraitFor(arcId: string): Portrait | undefined {
   return PORTRAITS.find((p) => p.arcId === arcId);

@@ -125,8 +125,19 @@ describe('the voice actually reaches the prompt', () => {
   });
 
   it('leaves an arc with no portrait exactly as it was, rather than inventing one', () => {
-    const { content } = promptFor(occasion({ arc: goliath, node: 'presenting' }))[1]!;
+    /* Every arc in the library has one now, so the fallback is exercised
+       against an arc that is not in it. The path still has to work: it is what
+       a twenty fifth arc gets on the day it is added. */
+    const nobody = { ...goliath, id: 'nobody-yet', label: 'Sans portrait' };
+    const { content } = promptFor(occasion({ arc: nobody, node: 'presenting' }))[1]!;
     expect(content).not.toContain('Sa voix');
-    expect(content).toContain(goliath.label);
+    expect(content).toContain('Sans portrait');
+  });
+
+  it('gives the whole library a voice, so nobody falls back to the structure', () => {
+    for (const arc of LIBRARY) {
+      const { content } = promptFor(occasion({ arc, node: arc.initial }))[1]!;
+      expect(content, `${arc.id} speaks in the structural voice`).toContain('Sa voix');
+    }
   });
 });
