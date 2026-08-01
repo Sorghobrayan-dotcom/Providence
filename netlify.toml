@@ -5,6 +5,17 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  # Pinned rather than left to whatever the platform defaults to this month.
+  # Vite 8 needs ^20.19 or >=22.12, and a build that fails on a version bump
+  # nobody chose is an unpleasant way to find that out.
+  NODE_VERSION = "22"
+
+# The two server-side pieces are picked up from netlify/edge-functions/ and
+# declare their own paths: /scripture/* and /gloo/*. They are the reason the
+# thing to deploy is this repository and not the dist folder — dragging the
+# build output in gives a site that renders and cannot speak.
+
 # index.html is the editor, and it is the product. nuit-du-baton.html is the
 # earlier boss-fight prototype, kept because the editor reuses its renderer.
 # No redirect: the front door is already at the root.
