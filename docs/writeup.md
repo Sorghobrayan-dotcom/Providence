@@ -11,9 +11,9 @@ fills that gap. Not a game, not an engine — a library you put underneath one.
 
 **Souls.** 24 NPC arcs drawn from the text, because game characters never change
 and biblical ones do little else. Jonah flees the errand you gave him. Peter
-breaks under pressure and can only be restored, never bought — sell him while he
-walks beside you and he leaves, at four kindnesses a betrayal to return. Balaam's
-donkey overrules the player's own input.
+breaks under pressure and can only be restored, never bought — sell him and he
+leaves, at four kindnesses a betrayal to return. Balaam's donkey overrules the
+player's own input.
 
 **Encounters.** Walk within three metres and he opens, in his own words, out of
 his arc, his state and your record. The gesture that matters moves nothing: ask
@@ -29,8 +29,7 @@ betraying a stranger and a sworn ally differ by exactly five.
 
 **Grace.** Specified in `docs/grace.md` before a line of it existed. One draw per
 episode at 0.2, so four desperate moments in five receive nothing. No game code
-can call it, no parameter shapes it, and its rate moves with nothing the player
-did.
+can call it, no parameter shapes it, and its rate ignores the player entirely.
 
 Measured rather than asserted: 522 tests, ten thousand characters in the graph, a
 thousand headless runs per room. Same cast, same seed, palace against desert:
@@ -50,6 +49,6 @@ reference under words that were not Scripture — our own paraphrases, then a
 generated line. Paraphrase beside a reference reads as the verse, so the answer
 is now checked for recitation, and only Scripture is cited.
 
-The brief asks for Scripture where people already are. Hundreds of
-millions live in game worlds. We did not build them a Bible. We put Scripture
-into the ground they walk on.
+The brief asks for Scripture where people already are. Hundreds of millions live
+in game worlds. We did not build them a Bible. We put Scripture into the ground
+they walk on.
