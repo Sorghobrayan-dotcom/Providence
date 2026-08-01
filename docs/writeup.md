@@ -35,7 +35,7 @@ did.
 Measured rather than asserted: 522 tests, ten thousand characters in the graph, a
 thousand headless runs per room. Same cast, same seed, palace against desert:
 Martha complains every time in one and settles in the other, and neither arc
-mentions the other or the room.
+knows the other or the room exists.
 
 Both APIs are structural. Nothing in the engine stores a verse; everything holds
 a reference, and the resolver is the only door text comes through, live from the
@@ -45,11 +45,10 @@ each line of it carrying the passage it is read from. It also arbitrates what th
 engine cannot classify: own rules first, the model only if unsure, then a check.
 
 Our hardest problems were all honesty. A character's memory was frozen at
-creation, so it reacted to a world that had moved on. And twice we caught
-ourselves setting a reference under words that were not Scripture — our own
-paraphrases, then a generated line. Paraphrase beside a reference reads as the
-verse, so the answer is checked for recitation rather than trusted, and only
-Scripture is cited.
+creation, so it reacted to a world that had moved on. And twice we set a
+reference under words that were not Scripture — our own paraphrases, then a
+generated line. Paraphrase beside a reference reads as the verse, so the answer
+is now checked for recitation, and only Scripture is cited.
 
 The brief asks for Scripture where people already are. Hundreds of
 millions live in game worlds. We did not build them a Bible. We put Scripture
