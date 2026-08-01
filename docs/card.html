@@ -44,6 +44,12 @@
   }
   .plate { padding: 0 74px; width: 100%; }
 
+  /* The mark, hanging dead still. In the editor it swings on a damped pendulum
+     and every event in the world knocks it; here there is no world, so it reads
+     as what a plumb line reads as when nothing is happening: true. */
+  .mark { position: absolute; right: 96px; top: 50%; transform: translateY(-50%); }
+  .mark svg { width: 190px; height: 190px; opacity: .92; }
+
   .eyebrow {
     font-family: 'Courier New', monospace;
     font-size: 13px;
@@ -86,13 +92,23 @@
 
 <div class="frame"></div>
 
+<!-- The same geometry as src/editor/logo.ts, so the card and the running tool
+     cannot show two different marks. -->
+<div class="mark">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <line x1="4" y1="3" x2="20" y2="3" stroke="#c9a227" stroke-width="1.1" stroke-linecap="square"/>
+    <line x1="12" y1="3" x2="12" y2="15" stroke="#c9a227" stroke-width="0.77"/>
+    <path d="M 12 15 L 16.2 18.4 L 12 21.5 L 7.8 18.4 Z" fill="#c9a227"/>
+  </svg>
+</div>
+
 <div class="plate">
   <div class="eyebrow">YouVersion &times; Gloo &nbsp;&middot;&nbsp; Scripture in New Frontiers</div>
   <h1>PROVIDENCE</h1>
   <div class="rule"></div>
-  <div class="said">A moral physics layer for game engines.</div>
+  <div class="said">What if relationships had physics?</div>
   <div class="then">
-    Your engine already knows where the body falls. <b>It has no idea what that costs.</b>
+    A moral consequence layer for game engines. <b>Every rule drawn from Scripture.</b>
   </div>
 </div>
 
