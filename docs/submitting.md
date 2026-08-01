@@ -33,9 +33,18 @@ Already selected. One track.
 
 ## Media gallery
 
-**The video first.** Upload it to YouTube — *Unlisted* is enough and is faster
-than Public, but check the writeup renders it before you rely on that. Paste the
-link here.
+**The video first, and set it Public.** Not *Unlisted*. Unlisted does satisfy
+"judges can access without logging in", but the rules say **"Post it publicly on
+YouTube"** in as many words, and a rule you have half-met is not worth the
+minute it saves.
+
+Paste the link here. The Media Gallery is where requirement (c) says the video
+is attached, and it is the field that accepts a YouTube URL.
+
+**Then paste it again under Project links.** The rules say the video is attached
+to the Media Gallery in one place and to "drop the direct link in your writeup"
+in another. Both readings cost one paste each, so satisfy both and stop thinking
+about it.
 
 Then, in this order:
 
@@ -66,9 +75,22 @@ Add all four. The order matters — a judge clicks the first one.
 | label | url |
 | --- | --- |
 | Live demo | `https://providencenet.netlify.app` |
-| Code | `https://github.com/Sorghobrayan-dotcom/Providence/tree/standing-and-staging` |
-| Notebook | *(the Kaggle notebook URL, once it is public)* |
-| Video | *(the YouTube link)* |
+| Code | `https://github.com/Sorghobrayan-dotcom/Providence` |
+| Notebook | `https://www.kaggle.com/code/brayansorgho/providence-a-moral-physics-layer-for-game-engine` |
+| Video | *(the YouTube link, the same one as in the Media Gallery)* |
+
+The bare repository URL is correct **only once `main` carries the work**. Until
+then it lands a judge on a branch thirty-nine commits behind, missing the
+encounter, the portraits, the Gloo proxy and the Godot check — they would review
+the wrong code. One fast-forward fixes it:
+
+```
+git push origin standing-and-staging:main
+```
+
+Nothing is overwritten: `main` is a direct ancestor. If you would rather not
+touch it, link the branch instead:
+`https://github.com/Sorghobrayan-dotcom/Providence/tree/standing-and-staging`
 
 The GitHub link points at **`standing-and-staging`**, not at `main`. `main` does
 not have any of this on it.
