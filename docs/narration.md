@@ -112,6 +112,74 @@ climb on screen — that silence is the best moment in the video.
 
 ---
 
+## Speaking it as a French speaker
+
+The accent is not the thing to solve. No judge in an international competition
+scores an accent, and a project built in Ouagadougou being narrated by the person
+who built it is a fact in its favour rather than against it. What actually costs
+you is a word a listener does not catch — and that is fixed on screen, not in
+your mouth.
+
+**Put the words up as you say them.** You already have the exact text, so it is
+copy and paste: in Clipchamp, add a text block over each beat with the sentence
+you are speaking. Not a full caption track — ten or twelve landmark lines is
+enough:
+
+| when | on screen |
+| --- | --- |
+| opening | *What does it cost to betray someone? Nothing.* |
+| opening | *A murder and a handshake are two different state changes.* |
+| opening | *What if relationships had physics?* |
+| title | **Providence** — *a moral physics layer for game engines* |
+| Peter | *He swears he will follow me anywhere.* |
+| Peter | *His fear climbs on its own.* |
+| Peter | *He denies he has ever met me.* |
+| Peter | *Three kindnesses bring him back.* |
+| betrayal | *No threat. Nothing frightening him at all.* |
+| betrayal | *He does not deny me. He leaves.* |
+| betrayal | *A sworn ally weighs 21. A stranger weighs 3.* |
+| console | *Nothing in this engine stores a word of Scripture.* |
+| close | *We placed Scripture where they already are.* |
+
+Now a missed word costs nothing, and the video reads as deliberate rather than
+as compensation. Most good technical demos do this anyway.
+
+**Read slower than feels natural.** Slow and clear beats fast and native. Leave
+the pauses your own line breaks ask for; they were the right instinct.
+
+**Say the numbers rather than reading them.** *twenty-one*, *three*, *five
+hundred and twenty-two*.
+
+### The words worth rehearsing twice
+
+Everything else in the script is ordinary English. These are the ones that carry
+meaning, so they are the ones to land.
+
+| word | say it |
+| --- | --- |
+| Providence | PROV-i-dence — stress the first syllable, not the second |
+| Scripture | SKRIP-cher |
+| betray / betrayal | bi-TRAY / bi-TRAY-ul |
+| gravity | GRAV-i-ty |
+| Jonah | JOH-nuh, not *Jonas* |
+| Peter | PEE-ter |
+| Martha | MAR-thuh |
+| Grace | GRAYSS |
+| YouVersion | you-VER-zhun |
+| engine | EN-jin |
+| consequences | CON-si-kwen-ses |
+
+### If you record one take and cannot bear it
+
+Then narrate in French and put the English on screen instead — the same table
+above, only now it is doing the whole job. It costs you nothing with the judges
+and it will sound like you. Do not spend more than one take deciding: pick
+whichever you can say without hesitating, and go.
+
+What you must not do is reach for a synthetic voice. You already rejected
+generated video for being generic, and a generated voice is the same mistake with
+the same tell.
+
 ## If you have seconds to spare at the end
 
 One line, over the console:
