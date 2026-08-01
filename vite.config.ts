@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv, type Plugin } from 'vite';
 import { resolve } from 'node:path';
 
-import { GlooTokenSource } from './src/api/glooToken';
+import { handleGloo } from './functions-shared/gloo';
 
 /**
  * Gloo is not a static key. It is an OAuth2 client-credentials exchange: the
@@ -12,50 +12,35 @@ import { GlooTokenSource } from './src/api/glooToken';
  *
  * The secret stays in this Node process. What the browser gets is a same-origin
  * path with no credential in it at all.
+ *
+ * The forwarding itself is `functions-shared/gloo.ts`, which is also what the
+ * deployed edge function runs. It used to be written twice, and the copy that
+ * only existed here was the whole of it: production had no Gloo proxy at all, so
+ * a deployed site answered 404 and every character went quiet. Two
+ * implementations of one contract diverge, and the one nobody runs locally is
+ * always the one that is missing.
  */
 function glooProxy(clientId: string, clientSecret: string): Plugin {
-  const tokens = new GlooTokenSource({ clientId, clientSecret });
-
   return {
     name: 'gloo-credentials',
     configureServer(server) {
       server.middlewares.use('/gloo', (req, res) => {
         void (async () => {
-          const token = await tokens.token();
-          if (!token) {
-            /* Say which of the two it is. A missing key and a rejected one look
-               identical from the browser otherwise, and that is an afternoon. */
-            res.statusCode = tokens.isConfigured ? 502 : 503;
-            res.setHeader('Content-Type', 'application/json');
-            res.end(JSON.stringify({
-              error: tokens.isConfigured
-                ? 'Gloo refused the client credentials.'
-                : 'No GLOO_CLIENT_ID / GLOO_CLIENT_SECRET in .env',
-            }));
-            return;
-          }
-
           const chunks: Buffer[] = [];
           for await (const chunk of req) chunks.push(chunk as Buffer);
 
-          const upstream = await fetch(
-            `https://platform.ai.gloo.com${req.url ?? '/'}`,
-            {
+          const response = await handleGloo(
+            new Request(`http://localhost/gloo${req.url ?? '/'}`, {
               method: req.method ?? 'POST',
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-              },
+              headers: { 'content-type': 'application/json' },
               ...(chunks.length > 0 ? { body: Buffer.concat(chunks) } : {}),
-            },
+            }),
+            { clientId, clientSecret },
           );
 
-          // a token Gloo no longer accepts must not stay cached
-          if (upstream.status === 401) tokens.forget();
-
-          res.statusCode = upstream.status;
+          res.statusCode = response.status;
           res.setHeader('Content-Type', 'application/json');
-          res.end(await upstream.text());
+          res.end(await response.text());
         })().catch(() => {
           res.statusCode = 502;
           res.end('{"error":"gloo unreachable"}');

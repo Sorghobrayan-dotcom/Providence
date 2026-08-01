@@ -10,7 +10,7 @@ than a day.
 | | |
 | --- | --- |
 | engine | 5,540 lines across 21 modules |
-| tests | 6,144 lines, 509 assertions in 36 files |
+| tests | 6,458 lines, 522 assertions in 37 files |
 | editor | 3,578 lines, 170 assertions in 11 files |
 | notebook | 47 cells, 25 of them executable, all passing |
 | bundle | 59 kB for the editor, 482 kB for Three.js |
@@ -100,6 +100,23 @@ toggle and only the toolbar followed, while the check that exists to catch that
 went on passing against the stale copy. `Soul` proves it had already happened —
 in the vocabulary, missing from the markup, so every cue sending a reader to that
 tab has failed to highlight it for as long as those cues have existed.
+
+**The deployment would have shipped mute, and nothing said so.** `vite.config.ts`
+proxies both credentials in development and only Scripture had a production
+counterpart, so a deployed site answered `/gloo/...` with a 404, `GlooVoice` read
+that as silence, and every character on the public demo would have narrated
+instead of speaking. The one feature the project is built around was missing the
+moment it left this machine, and the build was green, the tests passed and the
+docs described a site that did not exist. It was found by asking which folder to
+upload, which is the sort of question that finds this class of bug and no test
+ever does.
+
+`functions-shared/gloo.ts` is the missing half, with the three adapters the
+Scripture proxy already had. It reuses `GlooTokenSource` so the deployed path is
+the tested path, and it rebuilds the request from the fields it is willing to
+send: an open proxy onto a paid model is a worse failure than a mute one. Driven
+against the live API through the production handler, Jonah answers *Tu veux
+quoi, exactement ? Je n'ai rien à donner.*
 
 **The Godot addon has been run.** It was written, reviewed and shipped, and for
 a long time nobody had opened Godot once — which is why the phrasing everywhere

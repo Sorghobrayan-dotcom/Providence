@@ -168,17 +168,21 @@ cp .env.example .env
 ```
 
 Fill in `YOUVERSION_APP_KEY` (register at
-[platform.youversion.com](https://platform.youversion.com)) and optionally
-`GLOO_API_KEY`.
+[platform.youversion.com](https://platform.youversion.com)), and
+`GLOO_CLIENT_ID` with `GLOO_CLIENT_SECRET` if you want the characters to speak
+in their own words rather than only in Scripture. Gloo is not a static key: the
+two are exchanged for a bearer token that expires, which is why it is a small
+middleware rather than a header.
 
 Note the names are not prefixed `VITE_`. Anything with that prefix is compiled
 into the browser bundle and would be readable by anyone visiting the deployed
-site. The browser here calls `/scripture` on its own origin and `vite.config.ts`
-attaches the credential server side, so nothing secret is ever shipped. A test
-fails if someone reintroduces a `VITE_*KEY`.
+site. The browser calls `/scripture` and `/gloo` on its own origin and
+`vite.config.ts` attaches the credentials server side, so nothing secret is ever
+shipped. A test fails if someone reintroduces a `VITE_*KEY`.
 
-For production, keep the paths and move the header injection into a serverless
-function.
+The same paths hold in production, served by edge functions instead — see
+[docs/deploying.md](docs/deploying.md), which also says why the thing to deploy
+is the repository and not the `dist` folder.
 
 ### Gloo
 
@@ -241,7 +245,7 @@ enough for these four and not for the other twenty. See `godot/README.md`.
 npm test
 ```
 
-509 of them. The ones worth reading first are in
+522 of them. The ones worth reading first are in
 `src/__tests__/providenceIntegrity.test.ts`, which assert the claims this project
 makes about itself, and `providenceEndToEnd.test.ts`, which runs one story
 through every part of the engine at once and calls the real platform.
