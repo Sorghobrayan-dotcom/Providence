@@ -27,7 +27,7 @@ rules: a debt does not evaporate when someone rescues you, it moves onto the
 redeemer, and only a kinsman may do it. Nothing consults a reputation table, so
 betraying a stranger and a sworn ally differ by exactly five.
 
-**Grace.** Specified in `docs/grace.md` before a line of it existed. One draw per
+**Grace.** A way out nobody earned and no developer can grant. One draw per
 episode at 0.2, so four desperate moments in five receive nothing. No game code
 can call it, no parameter shapes it, and its rate ignores the player entirely.
 
