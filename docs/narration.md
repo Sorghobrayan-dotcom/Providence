@@ -1,129 +1,113 @@
-# The narration, cut to fit
+# The narration
 
-Your script is good writing. Measured, it is 360 words with 56 full stops and 8
-ellipses, and every line break in it is an instruction to pause — so it reads at
-about 110 to 120 words a minute, not 150. That puts it at **3m26 to 4m02 of
-voice alone**, before a single thing is shown.
+I cut the wrong things the first time. The brief asks how Scripture is put into
+practice and where somebody meets it without looking for it, and that is answered
+by the passage about the Bible and the passage about the player — not by the
+demo. Those stay, word for word.
 
-To reach three minutes you would have to read it at 140 words a minute, which
-fights the way it is built, and the video would still be three minutes of
-assertion with nothing demonstrated.
+Measured block by block at 115 words a minute, the script as written is **3m37**.
+Here is where every second of it goes:
 
-So: keep the opening and the close, which are the best things in it and are
-untouched below. Replace the middle with the one thing no other entry can show —
-Peter, happening.
+| block | words | time | |
+| --- | --- | --- | --- |
+| *People often think… a world that answers the player* | 34 | 0m19 | **cut** |
+| *our engines simulate gravity… it remembers nothing* | 53 | 0m31 | keep |
+| *So we asked ourselves… a library that lives beneath one* | 44 | 0m26 | keep |
+| *The Bible is more than a collection of sacred words…* | 48 | 0m29 | **keep — this is the point** |
+| *Jonah may run… and the world remembers* | 50 | 0m29 | keep, **over the demo** |
+| *For game creators… who they are* | 44 | 0m27 | **cut** |
+| *And then, there is the player…* | 50 | 0m31 | **keep — this is the brief** |
+| *Hundreds of millions… the world that remembers* | 43 | 0m25 | keep |
 
-**Measured at 115 words a minute: 2m44.** Fifteen seconds of headroom.
+Cut those two and nothing else: **2m51**, nine seconds spare, and every line you
+argued for is intact.
 
----
+## Why those two and no others
 
-## 1. Opening — 1m16. Read exactly as you wrote it.
+**The preamble.** *"People often think designing a great game is about writing a
+great story. It isn't."* It is a good frame and nothing later in the script
+depends on it. Opening cold on *"Today, our engines simulate gravity with
+extraordinary precision"* is a harder open, not a weaker one.
 
-*On screen: the site, still. Do not touch anything.*
+**"For game creators, this changes everything."** It says one thing four times —
+living worlds, relationships evolve, echoes through people, respond according to
+who they are — and by the time you say it, the audience has watched Peter walk
+away. It is the only passage in your script that sounds like an advertisement
+rather than like you.
 
-> People often think that designing a great game is about writing a great story.
-> It isn't.
-> Designing a great game is about building a world that answers the player in
-> ways that feel real.
->
-> Today, our engines simulate gravity with extraordinary precision.
-> Every collision.
-> Every arrow.
-> Every falling body.
->
-> But ask them one question.
-> What does it cost to betray someone?
-> Nothing.
->
-> To a game engine, a murder and a handshake are simply two different state
-> changes.
-> The body falls.
-> The world moves on.
-> It remembers nothing.
->
-> So we asked ourselves...
-> What if consequences had laws, just like gravity?
-> What if relationships had physics?
-> What if morality could become part of the simulation itself?
->
-> That question became...
-> Providence.
-> Not a game.
-> Not a game engine.
-> A library that lives beneath one.
+If you want one line of it back, keep this one and drop the rest: *"You are no
+longer scripting dialogue trees."* Eight words, five seconds, and it is concrete
+where the rest is not. That lands you at 2m56.
+
+## The thing I got wrong, which changes the whole plan
+
+Narration time and demo time are not added together. They run at the same time.
+
+*"Jonah may run from the mission you just gave him. Peter may deny you when fear
+becomes stronger than loyalty…"* — you say that **while Peter is on screen
+breaking under threat**. The words and the picture do different jobs in the same
+twenty-nine seconds. That is why nothing has to be sacrificed to show the thing
+working: the demo costs no narration time at all.
 
 ---
 
-## 2. Middle — 1m03. This is the part you *do*, not the part you say.
+## The running order
 
-Cut here: the Bible paragraph, *"For game creators, this changes everything"*,
-and the paragraph about the player. All three are assertions, and the demo makes
-them better than the words do. What follows is spoken over the screen.
+**0:00 — the gap.** *On screen: the site, still.*
+Open on *"Today, our engines simulate gravity with extraordinary precision"*
+through *"It remembers nothing."*
 
-*Click* **Le Serment Brise**. *Drag* next to him. *Press* **E**, then choose
-**« Demande-lui de te suivre. »**
+**0:31 — the question, and the name.** *Scroll the behaviour library slowly.*
+*"So we asked ourselves…"* through *"A library that lives beneath one."*
 
-> I built this. Let me show you one character.
-> Peter swears he will follow me anywhere.
+**0:57 — the Bible, read differently.** *Still on the library, 24 names visible.*
+*"The Bible is more than a collection of sacred words…"* through *"It translates
+their structures into gameplay."*
 
-*Toggle* **under threat**. Now say nothing for eight seconds. Let the fear meter
-climb on screen — that silence is the best moment in the video.
+This is the passage the whole entry turns on. Slow down here. It is the sentence
+that says you did not decorate a game with verses — you read the text as a
+description of how people actually behave, and built that.
 
-> Watch. I put him under threat, and I say nothing.
-> His fear climbs on its own.
+**1:26 — put into practice.** *Now the demo runs underneath.*
+Say *"Jonah may run from the mission you just gave him. Peter may deny you when
+fear becomes stronger than loyalty…"* and while you say it:
 
-*He breaks, on his own.*
+- click **Le Serment Brise**, walk up, press **E**, choose *« Demande-lui de te
+  suivre. »*
+- toggle **under threat** and stop talking for the eight seconds his fear takes
+  to climb. That silence is the best moment in the video.
+- he denies you, on his own
+- toggle it off, press **K** three times, he returns
+- open **Relations**, click **betray peter** — *no threat, nothing frightening
+  him* — and he simply leaves
 
-> Past a point, he denies he has ever met me.
-> Not stops helping. Denies.
+Finish the block on *"A blessing can travel. A debt can be transferred. Grace
+cannot be purchased. And the world remembers."*
 
-*Toggle it off. Press* **K** *three times.*
+**1:55 — the player who was not looking.** *On screen: the console, a verse in
+it marked* `YOUVERSION, LIVE`.
+*"And then… there is the player."* through *"…the world itself lives by those
+principles."*
 
-> Three kindnesses bring him back.
+Let the live verse sit on screen through this whole passage. You are saying
+somebody meets Scripture without going looking for it, and the proof of it is
+right there under the sentence.
 
-*Open* **Relations**, *click* **betray peter**.
-
-> And now the part a number cannot say.
-> I sell him. No threat. Nothing frightening him at all.
-
-*He turns and walks away.*
-
-> He does not deny me. He leaves.
-> Betraying a sworn ally weighs twenty-one where a stranger weighs three,
-> because the cost comes from the bond that broke.
-> And nothing in his behaviour mentions betrayal. It reads the graph.
-
----
-
-## 3. Close — 0m25. Read exactly as you wrote it.
-
-*On screen: the console, with a verse in it, marked* `YOUVERSION, LIVE`.
-
-> Hundreds of millions of people already live inside virtual worlds.
-> We didn't build them another Bible.
-> We placed Scripture where they already are.
->
-> Not inside a dialogue.
-> Not inside a cutscene.
-> But beneath every step they take.
->
-> Providence.
-> The world that remembers.
+**2:26 — close.** *"Hundreds of millions of people already live inside virtual
+worlds…"* through *"Providence. The world that remembers."*
 
 ---
 
 ## Speaking it as a French speaker
 
 The accent is not the thing to solve. No judge in an international competition
-scores an accent, and a project built in Ouagadougou being narrated by the person
-who built it is a fact in its favour rather than against it. What actually costs
-you is a word a listener does not catch — and that is fixed on screen, not in
-your mouth.
+scores an accent, and a project built in Ouagadougou narrated by the person who
+built it is a fact in its favour. What costs you is a word a listener does not
+catch — and that is fixed on screen, not in your mouth.
 
-**Put the words up as you say them.** You already have the exact text, so it is
-copy and paste: in Clipchamp, add a text block over each beat with the sentence
-you are speaking. Not a full caption track — ten or twelve landmark lines is
-enough:
+**Put the words up as you say them.** You already have the text, so it is copy
+and paste: in Clipchamp, a text block over each beat. Not a full caption track —
+these are enough:
 
 | when | on screen |
 | --- | --- |
@@ -131,33 +115,26 @@ enough:
 | opening | *A murder and a handshake are two different state changes.* |
 | opening | *What if relationships had physics?* |
 | title | **Providence** — *a moral physics layer for game engines* |
-| Peter | *He swears he will follow me anywhere.* |
+| the Bible | *One of humanity's deepest explorations of human nature.* |
+| the Bible | *It translates their structures into gameplay.* |
 | Peter | *His fear climbs on its own.* |
 | Peter | *He denies he has ever met me.* |
-| Peter | *Three kindnesses bring him back.* |
 | betrayal | *No threat. Nothing frightening him at all.* |
 | betrayal | *He does not deny me. He leaves.* |
-| betrayal | *A sworn ally weighs 21. A stranger weighs 3.* |
-| console | *Nothing in this engine stores a word of Scripture.* |
+| the player | *They opened it looking for adventure.* |
+| the player | *Not because the game tells them what to believe.* |
 | close | *We placed Scripture where they already are.* |
 
-Now a missed word costs nothing, and the video reads as deliberate rather than
-as compensation. Most good technical demos do this anyway.
-
-**Read slower than feels natural.** Slow and clear beats fast and native. Leave
+**Read slower than feels natural.** Slow and clear beats fast and native. Keep
 the pauses your own line breaks ask for; they were the right instinct.
 
-**Say the numbers rather than reading them.** *twenty-one*, *three*, *five
-hundred and twenty-two*.
+**Say the numbers, do not read them.** *twenty-one*, *three*.
 
 ### The words worth rehearsing twice
 
-Everything else in the script is ordinary English. These are the ones that carry
-meaning, so they are the ones to land.
-
 | word | say it |
 | --- | --- |
-| Providence | PROV-i-dence — stress the first syllable, not the second |
+| Providence | PROV-i-dence — stress the first syllable |
 | Scripture | SKRIP-cher |
 | betray / betrayal | bi-TRAY / bi-TRAY-ul |
 | gravity | GRAV-i-ty |
@@ -166,27 +143,20 @@ meaning, so they are the ones to land.
 | Martha | MAR-thuh |
 | Grace | GRAYSS |
 | YouVersion | you-VER-zhun |
-| engine | EN-jin |
 | consequences | CON-si-kwen-ses |
+| deepest | DEE-pist |
 
 ### If you record one take and cannot bear it
 
-Then narrate in French and put the English on screen instead — the same table
-above, only now it is doing the whole job. It costs you nothing with the judges
-and it will sound like you. Do not spend more than one take deciding: pick
-whichever you can say without hesitating, and go.
+Narrate in French and put the English on screen instead — the table above then
+does the whole job. It costs you nothing with the judges and it will sound like
+you. Decide in one take, not five.
 
-What you must not do is reach for a synthetic voice. You already rejected
-generated video for being generic, and a generated voice is the same mistake with
-the same tell.
+Not a synthetic voice. You rejected generated video for being generic, and a
+generated voice is the same mistake with the same tell.
 
-## If you have seconds to spare at the end
+## If you are still long at the end
 
-One line, over the console:
-
-> Every line here carries the passage it came from, and the verse under it
-> arrived from YouVersion a second ago. Nothing in this engine stores a word of
-> Scripture. Pull the key and every character goes silent.
-
-That is the sentence that proves the brief was answered rather than decorated.
-If you must choose between it and anything else, keep it.
+Cut from the demo, never from the Bible passage or the player passage. Drop the
+three kindnesses and go straight from the denial to the betrayal; it saves
+fifteen seconds and the betrayal is the stronger beat anyway.
