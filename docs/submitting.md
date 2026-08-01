@@ -79,13 +79,30 @@ Open it in a private window. If it 404s, the repository is private, and a judge
 will see the same 404. Make it public in *Settings → General → Danger Zone →
 Change repository visibility*.
 
-### The notebook
+### The notebook, and how to make it public
 
-Kaggle, *Code*, *New Notebook*, *File → Import Notebook*, choose
-`notebook/providence.ipynb`. Then *Add-ons → Secrets*, add
-`YOUVERSION_APP_KEY`, enable it for the notebook. *Run All*, *Save Version*, and
-set it **Public** before you paste the link. 25 code cells, all passing, and one
-live call to the platform.
+Order matters here. Publish it before running it and a judge opens a notebook
+that has never executed, which is worse than not linking one at all.
+
+1. Kaggle → **Code** → **New Notebook** → *File* → **Import Notebook** → choose
+   `notebook/providence.ipynb`.
+2. **Add-ons → Secrets** → *Add a secret* → name it exactly
+   `YOUVERSION_APP_KEY`, paste the key, and **attach it to this notebook** with
+   the toggle. Without the toggle the notebook cannot see it.
+3. **Run All.** 25 code cells, about a minute. Every one prints its own proof.
+4. **Save Version** (top right) → *Save & Run All (Commit)*. This is what stores
+   the outputs a judge will read.
+5. Wait for the version to finish, then **Share** (top right) → switch
+   **Private** to **Public** → *Save*.
+6. Copy the URL from the address bar. That is the link for the writeup.
+
+**Making it public does not publish your key.** A Kaggle secret belongs to your
+account, not to the notebook file — anyone who opens or copies it gets no key at
+all, and the notebook then prints *"No App Key, so nothing is fetched and nothing
+is invented"* and shows the silence. That is the designed behaviour and it
+happens to demonstrate the central claim, so it costs you nothing.
+
+The notebook never prints the key itself, only `App Key present: True`. Checked.
 
 If time runs out on this, submit without it. The live demo and the repository
 carry the entry on their own, and a notebook link that 404s is worse than no
