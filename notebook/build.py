@@ -1206,6 +1206,19 @@ whatever comes back.
 
 The reason is not distrust of the model. A moral engine whose rules a generative system can
 rewrite at runtime does not have rules.
+
+**Where Gloo is live, and why it is not live here.** In the deployed editor, Gloo does two
+jobs: it gives every character their own words — generated from that arc's portrait, its
+state, and what the player has done — and it arbitrates the vocabulary below. You can watch
+both at [providencenet.netlify.app](https://providencenet.netlify.app): walk up to somebody,
+press **E**, and the line that comes back was written a second ago by a model that is
+forbidden to quote Scripture and is checked for recitation before the character is allowed
+to say it.
+
+In this notebook the model is stubbed, on purpose. What the next cells prove is that a
+proposal outside the vocabulary is **refused** — and a refusal you cannot reproduce is not
+a proof. Stubbing the response is what makes the four refusals below deterministic. The
+validation is the same code path a live answer takes.
 """)
 
 code('''
