@@ -1420,7 +1420,7 @@ md("""
 
 ## Where the real engine lives
 
-This notebook is a faithful port of the laws. The engine itself is TypeScript, with 509
+This notebook is a faithful port of the laws. The engine itself is TypeScript, with 522
 tests, a Godot addon, and an editor whose viewport is a real 3D scene rather than a
 diagram. The repository link is in the writeup.
 
