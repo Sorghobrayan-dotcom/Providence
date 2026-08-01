@@ -38,7 +38,7 @@ episode at 0.2, so four desperate moments in five receive nothing. No game code
 can call it, no parameter shapes it, and its rate moves with nothing the player
 did.
 
-Measured rather than asserted: 509 tests, ten thousand characters in the graph, a
+Measured rather than asserted: 522 tests, ten thousand characters in the graph, a
 thousand headless runs per room. Same cast, same seed, palace against desert:
 Martha complains every time in one and settles in the other, and neither arc
 mentions the other or the room.

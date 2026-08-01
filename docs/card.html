@@ -1,0 +1,101 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Providence — writeup card</title>
+<!--
+  The Kaggle writeup card. It asks for 560x280, which is 2:1 and not the 16:9
+  the cover is built at, so this is its own layout rather than a crop: cropping
+  the cover to 2:1 takes the footer numbers off the bottom, and those numbers
+  are the whole reason the card is worth looking at.
+
+  Rendered at 1120x560 so it stays sharp where the gallery scales it up. Chrome
+  resolves --screenshot against its own working directory, so the path must be
+  absolute:
+
+  chrome --headless=new --disable-gpu --hide-scrollbars --window-size=1120,560 \
+    "--screenshot=C:\Users\techa\Desktop\il-est-ecrit\docs\card.png" \
+    "file:///C:/Users/techa/Desktop/il-est-ecrit/docs/card.html"
+-->
+<style>
+  :root {
+    --ink: #07070a;
+    --gold: #c9a227;
+    --gold-dim: #6b5518;
+    --bone: #ece6da;
+    --ash: #8a8378;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1120px; height: 560px; }
+  body {
+    background:
+      radial-gradient(760px 540px at 16% -12%, rgba(201, 162, 39, .20), transparent 62%),
+      radial-gradient(560px 420px at 82% 112%, rgba(201, 162, 39, .07), transparent 60%),
+      var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    color: var(--bone);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .frame {
+    position: absolute;
+    inset: 22px;
+    border: 1px solid rgba(201, 162, 39, .30);
+    pointer-events: none;
+  }
+  .plate { padding: 0 74px; width: 100%; }
+
+  .eyebrow {
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    letter-spacing: .30em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 26px;
+  }
+  h1 {
+    font-size: 86px;
+    line-height: .92;
+    letter-spacing: -.03em;
+    font-weight: 400;
+    text-shadow: 0 0 40px rgba(201, 162, 39, .28);
+  }
+  .rule {
+    width: 132px;
+    height: 1px;
+    background: var(--gold-dim);
+    margin: 26px 0 22px;
+  }
+  .said { font-size: 27px; font-style: italic; color: var(--bone); }
+  .then { font-size: 20px; color: var(--ash); margin-top: 12px; }
+  .then b { color: var(--bone); font-weight: 400; font-style: normal; }
+
+  .foot {
+    position: absolute;
+    left: 74px;
+    right: 74px;
+    bottom: 46px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    letter-spacing: .12em;
+    color: var(--ash);
+    text-transform: uppercase;
+  }
+  .foot b { color: var(--gold); font-weight: 400; }
+  .dot { color: var(--gold-dim); margin: 0 14px; }
+</style>
+
+<div class="frame"></div>
+
+<div class="plate">
+  <div class="eyebrow">YouVersion &times; Gloo &nbsp;&middot;&nbsp; Scripture in New Frontiers</div>
+  <h1>PROVIDENCE</h1>
+  <div class="rule"></div>
+  <div class="said">A moral physics layer for game engines.</div>
+  <div class="then">
+    Your engine already knows where the body falls. <b>It has no idea what that costs.</b>
+  </div>
+</div>
+
+<div class="foot">
+  <b>24</b> archetypes<span class="dot">&middot;</span><b>522</b> tests<span class="dot">&middot;</span><b>10,000</b>-soul graph<span class="dot">&middot;</span><b>0</b> verses stored
+</div>
